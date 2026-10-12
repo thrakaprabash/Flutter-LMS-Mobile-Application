@@ -1,4 +1,4 @@
-# Build and open the Day 1 Android app with one build worker.
+# Build and open the Flutter LMS Android app with one build worker.
 param([string]$Device = 'emulator-5554')
 $ErrorActionPreference = 'Stop'
 $projectDirectory = Split-Path $PSScriptRoot -Parent

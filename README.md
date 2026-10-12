@@ -17,9 +17,11 @@ The backend is the source of truth for permissions, validation, quiz scores, ass
 
 ## Current implementation status
 
-The Android project and shared login interface are implemented. Email/password fields, password visibility and a login preview action are available. Backend requests, authentication, dashboards and other role workflows are **planned and not yet implemented**. The current login button displays a preview message and does not sign in.
+Day 2 is implemented: local form validation, Login-to-Home navigation, named placeholder routes for onboarding and Student/Instructor/Admin dashboards, a shared Material theme, reusable widgets, and bundled image/font assets.
 
-The Android debug app has been built, installed and opened on an emulator. Formatting, analysis and two UI tests passed during verification.
+Use any valid email address and a password of at least 8 characters containing uppercase, lowercase, a number and a special character to open the local preview. This validates input only and does not authenticate an account. Home exposes all placeholder routes for development previews. Real role routing, full dashboards, onboarding and API integration remain scheduled for later days.
+
+Formatting, analysis and three widget tests pass. See `docs/day_02.md` for scope and verification.
 
 ## Technology and prerequisites
 
@@ -194,7 +196,7 @@ The helper temporarily uses `.build-tmp` for Java's temporary files to avoid the
 | Paging file too small / Java or Dart out of memory | Close unnecessary applications. Use the helper and run tests after the build finishes. These errors indicate PC memory pressure; the helper cannot guarantee a build if the system has no memory available. |
 | PowerShell blocks the helper script | Use the normal Flutter command from an ordinary terminal, or use an execution policy approved for your PC. On managed PCs, ask your administrator. |
 | Visual Studio warning in Flutter Doctor | This project targets Android. Missing Windows C++ desktop tools do not block the Android target. |
-| Login does not open a dashboard | The current version provides a login preview. Authentication and dashboards are not implemented yet. |
+| Login does not open a dashboard | Use a valid email and 8 or more password characters to open Home. Dashboard routes are placeholders; API authentication is scheduled later. |
 
 ## Backend installation and startup
 
@@ -268,13 +270,20 @@ The current app has no API client or base URL configuration. When the network la
 ```text
 lib/
   main.dart                         Starts the Flutter application
-  app.dart                          Material application and initial screen
+  app.dart                          Material application and named routes
+  core/navigation/app_routes.dart   Login, Home and placeholder routes
+  core/theme/app_theme.dart         Shared colors, typography and components
+  shared/widgets/                   Reusable fields, buttons, headers and messages
   features/auth/presentation/
-    login_screen.dart               Shared login preview
+    login_screen.dart               Local form validation
+  features/home/presentation/
+    home_screen.dart                Development route preview
+assets/                             Bundled book image and Roboto fonts
 android/                            Android host and build configuration
-test/widget_test.dart               Login behavior and keyboard layout checks
+test/widget_test.dart               Validation, navigation and keyboard layout checks
 scripts/run_android.ps1             Build, install and open on an x64 emulator
 docs/day_01.md                      Day 1 progress and Flutter learning notes
+docs/day_02.md                      Day 2 scope and verification
 pubspec.yaml                        SDK requirements and dependencies
 ```
 
@@ -292,7 +301,7 @@ During initial verification, formatting and analysis passed, both UI tests passe
 
 ## Planned development
 
-The remaining application work includes navigation and form validation, onboarding, role-based dashboards, secure API/session handling, account recovery, student learning and assessment workflows, instructor content management, administrator tools and full workflow testing.
+The remaining application work includes full onboarding, role-based dashboards, secure API/session handling, account recovery, student learning and assessment workflows, instructor content management, administrator tools and full workflow testing.
 
 These are planned capabilities. Update the current implementation status as features are completed, and keep internal progress evidence in the appropriate authorized location.
 
