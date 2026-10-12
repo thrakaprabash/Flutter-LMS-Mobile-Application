@@ -2,7 +2,7 @@
 
 Flutter LMS is a mobile learning management application for **Students, Instructors and Administrators**. It is being developed against a supplied backend API, delivered as a Docker image, with a Postman collection and integration guides defining the API contract.
 
-This README is the setup and development guide for the whole project. Implementation progress is recorded separately in [daily progress notes](docs/day_01.md).
+This README describes the application, required software, Windows installation steps and commands for running and checking the project.
 
 ## Project overview
 
@@ -19,7 +19,7 @@ The backend is the source of truth for permissions, validation, quiz scores, ass
 
 The Android project and shared login interface are implemented. Email/password fields, password visibility and a login preview action are available. Backend requests, authentication, dashboards and other role workflows are **planned and not yet implemented**. The current login button displays a preview message and does not sign in.
 
-The Android debug app has been built, installed and opened on a Pixel 9a emulator. Formatting, analysis and two UI tests passed during verification. See [development notes](docs/day_01.md) for evidence and known memory limitations.
+The Android debug app has been built, installed and opened on an emulator. Formatting, analysis and two UI tests passed during verification.
 
 ## Technology and prerequisites
 
@@ -34,16 +34,16 @@ The Android debug app has been built, installed and opened on a Pixel 9a emulato
 
 The instructions below target a Windows PC running the app in an Android emulator. Only the Android platform is currently included in the repository.
 
-## Quick start on this PC
+## Run the application
 
-Flutter, Android Studio, the Android SDK and the Pixel 9a emulator are already installed. Start with these steps; you do not need to reinstall them.
+If Flutter and Android Studio are already installed, use these steps. Otherwise, complete the installation guide below first. Paths and device names in commands are examples; replace them with your own installation and project locations.
 
-1. Open Android Studio → **Device Manager** and press the play button beside **Pixel 9a**. Wait until the Android home screen appears. If it is already running, leave it open.
+1. Open Android Studio → **Device Manager** and press the play button beside your configured emulator. Wait until the Android home screen appears. If it is already running, leave it open.
 2. Open PowerShell or a VS Code terminal.
 3. Run the commands below **one at a time**:
 
 ```powershell
-Set-Location 'D:\FlutterProjects\Onboarding Task Assignment\flutter_lms'
+Set-Location 'C:\Development\flutter_lms'
 flutter pub get
 flutter devices
 ./scripts/run_android.ps1
@@ -69,8 +69,8 @@ Skip this section if the quick start works. Internet access is needed to downloa
 
 - Install [Git for Windows](https://git-scm.com/downloads/win).
 - Download the Flutter SDK using the [official Windows installation guide](https://docs.flutter.dev/install/manual). Use Flutter **3.47.7** to match the version used for this project. Its Dart SDK is **3.13.5**; Dart is included with Flutter and does not need a separate installation.
-- Extract Flutter into a writable folder, for example `E:\Flutter\flutter`.
-- Open Windows **Edit environment variables for your account** → select **Path** → **Edit** → **New**, and add the Flutter `bin` directory, for example `E:\Flutter\flutter\bin`.
+- Extract Flutter into a writable folder, for example `C:\Development\flutter`.
+- Open Windows **Edit environment variables for your account** → select **Path** → **Edit** → **New**, and add the Flutter `bin` directory, for example `C:\Development\flutter\bin`.
 - Close and reopen PowerShell and VS Code so they pick up the new Path.
 
 Check the installation:
@@ -100,10 +100,10 @@ In **SDK Tools**, install:
 
 Enable **Show Package Details** to select specific versions of NDK, CMake or Build-Tools. Flutter determines the NDK version through `flutter.ndkVersion`; using a different Flutter SDK may change that requirement.
 
-Note the **Android SDK Location** shown in SDK Manager. On this PC it is `E:\sdk`. Configure Flutter with your actual location, then review the Android licenses:
+Note the **Android SDK Location** shown in SDK Manager. Configure Flutter with that location. The following commands use an example SDK location, then open the Android license check:
 
 ```powershell
-flutter config --android-sdk 'E:\sdk'
+flutter config --android-sdk 'C:\Android\Sdk'
 flutter doctor --android-licenses
 flutter doctor -v
 ```
@@ -155,7 +155,7 @@ flutter doctor -v
 flutter devices
 ```
 
-On another PC, replace the quick-start folder path with your own project location. Do not copy another developer's `android/local.properties`; it contains machine-specific SDK paths and is ignored by Git. A normal Flutter build/run generates the file when needed. If the helper reports it missing, generate Android configuration once before retrying:
+Replace the example project path with your own project location. Do not copy another developer's `android/local.properties`; it contains machine-specific SDK paths and is ignored by Git. A normal Flutter build/run generates the file when needed. If the helper reports it missing, generate Android configuration once before retrying:
 
 ```powershell
 flutter build apk --debug --config-only
@@ -177,7 +177,7 @@ flutter run -d emulator-5554
 
 While it is running, press **r** for hot reload, **R** for hot restart or **q** to end the session. In VS Code, you can instead choose the Android emulator and press **F5**.
 
-On this workstation, the ordinary launcher encountered memory failures. The quick-start helper builds directly with Gradle using one worker, waits for that build to finish, then installs and opens the APK with Android's device tools. It does not provide hot reload or a debugger connection.
+If the ordinary launcher encounters memory failures, use the provided helper. The quick-start helper builds directly with Gradle using one worker, waits for that build to finish, then installs and opens the APK with Android's device tools. It does not provide hot reload or a debugger connection.
 
 The helper temporarily uses `.build-tmp` for Java's temporary files to avoid the loopback-path error observed in the desktop app environment. It restores its environment variables afterward. Gradle heap, worker and Kotlin compiler settings are limited in `android/gradle.properties` to reduce memory use. Close unnecessary applications and run builds and tests separately.
 
@@ -196,58 +196,61 @@ The helper temporarily uses `.build-tmp` for Java's temporary files to avoid the
 | Visual Studio warning in Flutter Doctor | This project targets Android. Missing Windows C++ desktop tools do not block the Android target. |
 | Login does not open a dashboard | The current version provides a login preview. Authentication and dashboards are not implemented yet. |
 
-## Backend setup with Docker
+## Backend installation and startup
 
-The supplied backend image is `dckuma/flutter-lms-backend:v1.0.0`. Docker and Postman are needed for API development and the planned integrated application. The current login preview does not call the backend.
+The integrated application will require the authorized LMS backend. The current login preview works without it. Obtain the approved container image name, version, API documentation and Postman collection through your organization's authorized access process. Private resource links, registry identifiers, account details and access credentials are intentionally omitted from this README.
 
-Install [Docker Desktop for Windows](https://docs.docker.com/desktop/setup/install/windows-install/) and [Postman](https://www.postman.com/downloads/). Start Docker Desktop and wait until the engine is ready. Sign in to Docker Hub when required for image access.
+Install [Docker Desktop for Windows](https://docs.docker.com/desktop/setup/install/windows-install/) and [Postman Desktop](https://www.postman.com/downloads/). Start Docker Desktop and wait for its engine to be ready.
 
-For a first-time backend setup, run:
+For first-time setup, run these commands in PowerShell. At the prompt, enter the approved image name including its version tag. The value stays in the current terminal session:
 
 ```powershell
 docker version
 docker login
-docker pull dckuma/flutter-lms-backend:v1.0.0
-docker run -d --name flutter-lms-backend --restart unless-stopped -p 5000:5000 dckuma/flutter-lms-backend:v1.0.0
+$backendImage = Read-Host 'Enter the authorized backend image and version tag'
+docker pull $backendImage
+docker run -d --name flutter-lms-backend --restart unless-stopped -p 127.0.0.1:5000:5000 $backendImage
 ```
 
-The assignment supplies a prepared backend image. It does not require running backend source code, configuring a separate database or adding an `--env-file`.
+This port mapping exposes the backend on the local Windows host for development. It does not intentionally publish it to other devices on the network. The image must match the project's approved backend contract. Follow the privately supplied runtime instructions for any additional configuration; never place runtime secrets in this README or in source control.
 
-If `flutter-lms-backend` already exists, start that container instead of creating another one:
+If a container with this name already exists, start it instead of running the creation command again:
 
 ```powershell
 docker start flutter-lms-backend
 ```
 
-Verify its status and readiness:
+Check container status:
 
 ```powershell
-docker ps
-docker inspect --format '{{.State.Health.Status}}' flutter-lms-backend
-docker logs --tail 50 flutter-lms-backend
-Invoke-RestMethod 'http://localhost:5000/api/v1/health/ready'
+docker ps --filter name=flutter-lms-backend
+docker inspect --format '{{.State.Status}}' flutter-lms-backend
 ```
 
-The container should be running, expose port 5000 and report healthy. The supplied setup conversation records `/api/v1/health/ready` as the readiness endpoint. For shutdown or a later restart:
+If the approved image provides a health check, inspect it with:
+
+```powershell
+docker inspect --format '{{.State.Health.Status}}' flutter-lms-backend
+```
+
+To stop, start or restart the local backend:
 
 ```powershell
 docker stop flutter-lms-backend
 docker start flutter-lms-backend
+docker restart flutter-lms-backend
 ```
 
-This workstation already had the approved container running and healthy during the environment check. Backend commands here document the project setup; they do not mean API integration is already implemented in Flutter.
+## Postman setup
 
-## Postman and API resources
+1. Obtain the approved collection through an authorized channel.
+2. Open Postman, select **Import**, and choose the collection JSON file.
+3. Set its `baseUrl` variable to `http://localhost:5000` for local Windows testing.
+4. Check that an active environment does not override the collection with an unintended value.
+5. Follow the private API contract to test connectivity and authentication before dependent requests.
+6. Use returned record IDs and the collection's token-handling scripts rather than hardcoding values.
 
-Download the supplied materials:
-
-- [Backend API Report](https://drive.google.com/file/d/1Ld_IvM_4GHhoaakGetEbuWAv5LH_aCf3/view?usp=sharing): endpoint paths, methods, roles, request fields and expected results.
-- [Mobile API Integration Guide](https://drive.google.com/file/d/18kwcNqfnkxLb0TZER_TNbocSUFs4Acl2/view?usp=sharing): runtime setup, networking and recommended application architecture.
-- [Postman collection JSON](https://drive.google.com/file/d/16DjEWlX0f889g6Njln-8Iy38kxUlBXKc/view?usp=sharing): executable request examples, variables and token-capture scripts.
-
-Open Postman, choose **Import**, and select the downloaded collection JSON. Set the collection or active environment variable `baseUrl` to `http://localhost:5000`. Ensure an environment variable does not unintentionally override the collection value.
-
-Verify readiness first. During API implementation, run authentication requests before protected requests, use returned IDs for dependent requests, and follow the collection's scripts for tokens. Keep credentials and tokens out of source control. The supplied API Report and collection define the exact endpoint contract.
+Store passwords and tokens in your approved local secret storage. Do not publish populated environments, collection exports containing credentials, API responses with user information or backend logs.
 
 ## Android emulator networking
 
@@ -256,7 +259,7 @@ Verify readiness first. During API implementation, run authentication requests b
 | Postman on Windows | `http://localhost:5000` |
 | Flutter inside the Android emulator | `http://10.0.2.2:5000` |
 
-The emulator uses `10.0.2.2` to reach the Windows host. Do not use `localhost` for the host backend from inside the emulator. Keep `/api/v1` out of the base URL because endpoint paths already include it; the planned login request URL is `http://10.0.2.2:5000/api/v1/auth/login`.
+The emulator uses `10.0.2.2` to reach the Windows host. Do not use `localhost` for the host backend from inside the emulator. Keep `/api/v1` out of the base URL because endpoint paths already include it; append only the endpoint paths defined in the authorized API contract.
 
 The current app has no API client or base URL configuration. When the network layer is implemented, configure the emulator address, Android Internet permission and development-only cleartext HTTP access as required by the integration guide. A deployed backend should use HTTPS. These are planned integration requirements, not completed application features.
 
@@ -285,26 +288,13 @@ flutter analyze
 flutter test --concurrency=1
 ```
 
-During initial verification, formatting and analysis passed, both UI tests passed, and the Android debug APK built, installed and opened successfully on Pixel 9a. The direct build/install steps succeeded; the helper packages those steps for repeat use. The normal Flutter launcher still encountered system memory pressure in a follow-up check.
+During initial verification, formatting and analysis passed, both UI tests passed, and the Android debug APK built, installed and opened successfully on an emulator. The direct build/install steps succeeded; the helper packages those steps for repeat use. The normal Flutter launcher still encountered system memory pressure in a follow-up check.
 
-## Implementation roadmap
+## Planned development
 
-The assignment defines the following development sequence. This table describes planned scope; only the initial project and login UI are implemented.
+The remaining application work includes navigation and form validation, onboarding, role-based dashboards, secure API/session handling, account recovery, student learning and assessment workflows, instructor content management, administrator tools and full workflow testing.
 
-| Stage | Scope | Status |
-| --- | --- | --- |
-| Day 1 | Environment verification, project initialization, shared login UI and fundamentals | Project/UI complete; GitHub handled manually |
-| Day 2 | Navigation, forms, validation, assets and reusable styling | Planned |
-| Day 3 | Splash, onboarding, role dashboard shells and shared UI states | Planned |
-| Day 4 | Docker/Postman verification and the network/session foundation | Flutter integration planned; existing backend environment verified |
-| Day 5 | Authentication, token handling, password recovery and profiles | Planned |
-| Day 6 | Course browsing, enrollment, curriculum, lessons and progress | Planned |
-| Day 7 | Student quizzes, assignments, reviews and notifications | Planned |
-| Day 8 | Instructor course building and learner management | Planned |
-| Day 9 | Admin management, shared state, role navigation and animations | Planned |
-| Day 10 | Responsive polish, full workflow testing and handover | Planned |
-
-As features are completed, update this README's status and maintain daily progress notes with integrated endpoints, testing evidence and unresolved issues.
+These are planned capabilities. Update the current implementation status as features are completed, and keep internal progress evidence in the appropriate authorized location.
 
 ## Development conventions
 
@@ -317,17 +307,12 @@ As features are completed, update this README's status and maintain daily progre
 
 GitHub repository creation, commits and pushing are handled manually by the developer. The provided `.gitignore` excludes generated files and local SDK configuration.
 
-## References and progress
+## Data protection
 
-- Assignment: `../Assignment Docs/Flutter_LMS_10_Days_Detailed_Task_Plan.pdf`.
-- Commit guide: `../Assignment Docs/git_commit_standard.pdf`.
-- [Initial progress and Flutter fundamentals](docs/day_01.md).
-- [Flutter installation](https://docs.flutter.dev/install/manual).
-- [Flutter Android setup](https://docs.flutter.dev/platform-integration/android/setup).
-- [Flutter layouts](https://docs.flutter.dev/ui/layout).
+- Keep internal API documents, shared-drive resources, backend registry details and access instructions in authorized private channels.
+- Never commit passwords, tokens, private keys, signing keystores, populated environment files or user data.
+- Keep machine-specific SDK configuration out of source control.
+- Use authenticated, role-authorized access for integrated features; the current preview does not implement those controls yet.
+- Use HTTPS for deployed API connections. Local HTTP addresses in this guide are development examples only.
 
-The assignment PDFs are supplied separately from the application source. The Google Drive API resources above are the handover references for backend implementation.
-
-## Current application preview
-
-![Shared login screen on the Pixel 9a emulator](docs/evidence/day-one-login.png)
+The installation links in this README point only to public software vendors and public tooling documentation. No internal data-resource links or shared conversation links are included.
