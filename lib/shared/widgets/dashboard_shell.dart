@@ -1,24 +1,35 @@
 import 'package:flutter/material.dart';
 
-import '../data/dashboard_data.dart';
-import '../../../shared/widgets/app_state_view.dart';
-import '../../../shared/widgets/app_widgets.dart';
+import '../models/dashboard_models.dart';
+import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/app_widgets.dart';
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key, required this.role});
+class DashboardShell extends StatefulWidget {
+  const DashboardShell({
+    super.key,
+    required this.role,
+    required this.data,
+    this.courses = const [],
+    this.deadlines = const [],
+    this.management,
+  }) : assert(role != LmsRole.student || courses.length > 0),
+       assert(role == LmsRole.student || management != null);
   final LmsRole role;
+  final DashboardData data;
+  final List<CoursePreview> courses;
+  final List<DeadlinePreview> deadlines;
+  final ManagementPreview? management;
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<DashboardShell> createState() => _DashboardShellState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardShellState extends State<DashboardShell> {
   int _selected = 0;
   void _openShortcut(String title) => Navigator.of(context).push(
     MaterialPageRoute<void>(
       builder: (_) => Scaffold(
         appBar: AppBar(title: Text(title)),
-        body: const AppStateView(
-          status: UiStatus.empty,
+        body: const EmptyState(
           title: 'Coming soon',
           message: 'This feature will be connected in a later task.',
         ),
@@ -127,7 +138,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   List<Widget> _studentContent() => [
     _heading('Continue learning'),
-    _courseCard(StudentPreview.courses.first, featured: true),
+    _courseCard(widget.courses.first, featured: true),
     _heading('Quick access'),
     LayoutBuilder(
       builder: (context, bounds) => Wrap(
@@ -180,11 +191,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _DashboardCard(
       child: Column(
         children: [
-          for (var i = 0; i < StudentPreview.deadlines.length; i++) ...[
+          for (var i = 0; i < widget.deadlines.length; i++) ...[
             if (i > 0) const Divider(height: 28),
             Builder(
               builder: (context) {
-                final item = StudentPreview.deadlines[i];
+                final item = widget.deadlines[i];
                 return InkWell(
                   onTap: () => _openShortcut(item.title),
                   borderRadius: BorderRadius.circular(12),
@@ -245,7 +256,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       action: 'View all',
       onTap: () => setState(() => _selected = 1),
     ),
-    for (final course in StudentPreview.courses.skip(1)) ...[
+    for (final course in widget.courses.skip(1)) ...[
       _courseCard(course),
       const SizedBox(height: 12),
     ],
@@ -286,9 +297,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   List<Widget> _managementContent(DashboardData data) {
     final instructor = widget.role == LmsRole.instructor;
-    final preview = instructor
-        ? ManagementPreview.instructor
-        : ManagementPreview.admin;
+    final preview = widget.management!;
     final colors = Theme.of(context).colorScheme;
     final icons = instructor
         ? [
@@ -498,7 +507,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final data = DemoDashboards.forRole(widget.role);
+    final data = widget.data;
     final student = widget.role == LmsRole.student;
     return Scaffold(
       appBar: AppBar(
@@ -535,8 +544,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       body: SafeArea(
         child: _selected != 0
-            ? AppStateView(
-                status: UiStatus.empty,
+            ? EmptyState(
                 title: data.destinations[_selected],
                 message:
                     'Your ${data.destinations[_selected].toLowerCase()} will appear here once connected.',

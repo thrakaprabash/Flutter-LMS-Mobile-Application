@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/navigation/app_routes.dart';
+import '../../../core/routing/route_names.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -19,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (mounted) {
         Navigator.pushNamedAndRemoveUntil(
           context,
-          AppRoutes.onboarding,
+          RouteNames.onboarding,
           (_) => false,
         );
       }
@@ -82,8 +82,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       'Follow your progress and keep your learning goals in sight.',
     ),
   ];
-  void _finish() =>
-      Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (_) => false);
+  void _finish() => Navigator.pushNamedAndRemoveUntil(
+    context,
+    RouteNames.login,
+    (_) => false,
+  );
   @override
   void dispose() {
     _controller.dispose();

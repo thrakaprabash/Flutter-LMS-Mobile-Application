@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/navigation/app_routes.dart';
-import '../../../shared/widgets/app_widgets.dart';
+import '../../../core/routing/route_names.dart';
+import '../../../core/widgets/app_widgets.dart';
+import '../../../core/utils/validators.dart';
 
 /// Day 2 local validation only; no API authentication or session is created.
 class LoginScreen extends StatefulWidget {
@@ -29,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
     // Do not pass credentials through routes or persist preview passwords.
     _password.clear();
     setState(() => _obscurePassword = true);
-    Navigator.pushNamed(context, AppRoutes.home);
+    Navigator.pushNamed(context, RouteNames.home);
   }
 
   @override
@@ -102,17 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             hint: 'you@example.com',
                             icon: Icons.mail_outline,
                             keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              final email = (value ?? '').trim();
-                              if (email.isEmpty) {
-                                return 'Enter your email address.';
-                              }
-                              if (!RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
-                                  .hasMatch(email)) {
-                                return 'Enter a valid email address.';
-                              }
-                              return null;
-                            },
+                            validator: Validators.email,
                           ),
                           const SizedBox(height: 20),
                           AppInputField(
@@ -123,29 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             obscureText: _obscurePassword,
                             textInputAction: TextInputAction.done,
                             onSubmitted: (_) => _submit(),
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Enter your password.';
-                              }
-                              if (value.length < 8) {
-                                return 'Use at least 8 characters for this preview.';
-                              }
-                              if (!RegExp(r'[A-Z]').hasMatch(value)) {
-                                return 'Add at least one uppercase letter.';
-                              }
-                              if (!RegExp(r'[a-z]').hasMatch(value)) {
-                                return 'Add at least one lowercase letter.';
-                              }
-                              if (!RegExp(r'[0-9]').hasMatch(value)) {
-                                return 'Add at least one number.';
-                              }
-                              if (!RegExp(
-                                r'[!@#$%^&*(),.?":{}|<>_+\-=\[\]\\/;~`]',
-                              ).hasMatch(value)) {
-                                return 'Add at least one special character.';
-                              }
-                              return null;
-                            },
+                            validator: Validators.previewPassword,
                             suffixIcon: IconButton(
                               tooltip: _obscurePassword
                                   ? 'Show password'

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_lms/app.dart';
-import 'package:flutter_lms/shared/widgets/app_state_view.dart';
+import 'package:flutter_lms/core/widgets/app_state_view.dart';
+import 'package:flutter_lms/core/widgets/app_loading.dart';
+import 'package:flutter_lms/core/widgets/app_error_view.dart';
+import 'package:flutter_lms/core/widgets/empty_state.dart';
+import 'package:flutter_lms/core/widgets/app_success_view.dart';
 
 void main() {
   testWidgets('splash, swipe, back, and completion clear entry routes', (
@@ -76,13 +80,26 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: AppStateView(
-              status: status,
-              title: 'State ${status.name}',
-              message: 'Details',
-              actionLabel: status == UiStatus.error ? 'Retry' : null,
-              onAction: status == UiStatus.error ? () => retried = true : null,
-            ),
+            body: switch (status) {
+              UiStatus.loading => AppLoading(
+                title: 'State ${status.name}',
+                message: 'Details',
+              ),
+              UiStatus.empty => EmptyState(
+                title: 'State ${status.name}',
+                message: 'Details',
+              ),
+              UiStatus.error => AppErrorView(
+                title: 'State ${status.name}',
+                message: 'Details',
+                actionLabel: 'Retry',
+                onAction: () => retried = true,
+              ),
+              UiStatus.success => AppSuccessView(
+                title: 'State ${status.name}',
+                message: 'Details',
+              ),
+            },
           ),
         ),
       );

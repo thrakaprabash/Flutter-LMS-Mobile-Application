@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'core/navigation/app_routes.dart';
+import 'core/routing/route_names.dart';
+import 'core/routing/app_router.dart';
 import 'core/theme/app_theme.dart';
 
 class LmsApp extends StatelessWidget {
-  const LmsApp({super.key, this.initialRoute = AppRoutes.splash});
+  const LmsApp({super.key, this.initialRoute = RouteNames.splash});
   final String initialRoute;
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -12,6 +13,6 @@ class LmsApp extends StatelessWidget {
     debugShowCheckedModeBanner: false,
     theme: AppTheme.light,
     initialRoute: initialRoute,
-    routes: AppRoutes.routes,
+    routes: AppRouter.routes,
   );
 }

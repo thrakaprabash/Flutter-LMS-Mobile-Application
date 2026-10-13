@@ -19,7 +19,7 @@ The backend is the source of truth for permissions, validation, quiz scores, ass
 
 Day 3 is implemented: a splash screen, three-page onboarding with PageView, Student/Instructor/Admin dashboard shells, shared feedback states, and role-specific sample data separated from presentation.
 
-Launch flow: Splash → Onboarding → Login → Home role preview → Dashboard. Skip and Get started clear the entry routes; Back on onboarding returns to the preceding page and cannot reopen the splash. Onboarding appears on every fresh launch for this preview; persistence and real session routing are later work.
+Launch flow: Splash → Onboarding → Login → Home role preview → Dashboard. Skip and Get started clear the entry routes; Back on onboarding returns to the preceding page and cannot reopen the splash. Onboarding appears on every fresh launch for this preview; persistence and real session routing are later work. The existing UI structure follows the integration guide’s feature folders and shared core components.
 
 Use any valid email address and a password of at least 8 characters containing uppercase, lowercase, a number and a special character to open the local preview. This validates input only and does not authenticate an account. Home exposes all three dashboard roles. Dashboard navigation and shortcuts open explicit coming-soon states.
 
@@ -270,23 +270,35 @@ The current app has no API client or base URL configuration. When the network la
 
 ```text
 lib/
-  main.dart                         Starts the Flutter application
-  app.dart                          Material application and named routes
-  core/navigation/app_routes.dart   Login, Home and placeholder routes
-  core/theme/app_theme.dart         Shared colors, typography and components
-  shared/widgets/                   Reusable fields, buttons, headers and messages
-  features/auth/presentation/
-    login_screen.dart               Local form validation
-  features/home/presentation/
-    home_screen.dart                Development route preview
-assets/                             Bundled book image and Roboto fonts
-android/                            Android host and build configuration
-test/widget_test.dart               Validation, navigation and keyboard layout checks
-scripts/run_android.ps1             Build, install and open on an x64 emulator
-docs/day_01.md                      Day 1 progress and Flutter learning notes
-docs/day_02.md                      Day 2 scope and verification
-pubspec.yaml                        SDK requirements and dependencies
+  main.dart / app.dart               Application entry and Material app
+  core/
+    routing/                        app_router.dart and route_names.dart
+    theme/                          Shared theme
+    utils/                          Existing validators and UI message
+    widgets/                        Inputs, buttons and standard feedback states
+  shared/
+    models/                         Shared dashboard preview model definitions
+    widgets/                        Reusable dashboard shell and cards
+  features/
+    auth/screens/                   Local login form (Day 2 preview)
+    home/screens/                   Development role preview
+    onboarding/screens/             Splash and three onboarding pages
+    student/dashboard/
+      models/                       Student sample dashboard data
+      screens/                      StudentHomeScreen
+    instructor/dashboard/
+      models/                       Instructor sample dashboard data
+      screens/                      InstructorHomeScreen
+    admin/dashboard/
+      models/                       Admin sample dashboard data
+      screens/                      AdminHomeScreen
+assets/                             Bundled illustrations, images and fonts
+android/                            Existing Android host and splash resources
+test/                               Login, entry flow, dashboard and state tests
+docs/day_03.md                      Current milestone scope and verification
 ```
+
+Current milestone is Day 3. The guide's network, storage, API constants, services, providers, session models and later feature folders are deferred until their scheduled days are explicitly authorized. Only folders containing implemented Day 1-3 code are created.
 
 ## Check code quality
 

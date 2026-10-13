@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/navigation/app_routes.dart';
-import '../../../shared/widgets/app_widgets.dart';
+import '../../../core/routing/route_names.dart';
+import '../../../core/widgets/app_widgets.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -29,9 +29,9 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     for (final entry in const {
-                      'Student dashboard': AppRoutes.student,
-                      'Instructor dashboard': AppRoutes.instructor,
-                      'Admin dashboard': AppRoutes.admin,
+                      'Student dashboard': RouteNames.student,
+                      'Instructor dashboard': RouteNames.instructor,
+                      'Admin dashboard': RouteNames.admin,
                     }.entries)
                       ListTile(
                         title: Text(entry.key),
@@ -46,7 +46,7 @@ class HomeScreen extends StatelessWidget {
                 label: 'Back to login',
                 onPressed: () => Navigator.pushNamedAndRemoveUntil(
                   context,
-                  AppRoutes.login,
+                  RouteNames.login,
                   (_) => false,
                 ),
               ),
