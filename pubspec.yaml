@@ -91,6 +91,9 @@ flutter:
   assets:
     - assets/images/learning.png
     - assets/images/university-students.png
+    - assets/images/onboarding-learn.png
+    - assets/images/onboarding-together.png
+    - assets/images/onboarding-progress.png
   fonts:
     - family: LmsRoboto
       fonts:

@@ -12,7 +12,7 @@ void main() {
   testWidgets('invalid input stays on login with actionable errors', (
     tester,
   ) async {
-    await tester.pumpWidget(const LmsApp());
+    await tester.pumpWidget(const LmsApp(initialRoute: '/'));
     await submit(tester);
     expect(find.text('Enter your email address.'), findsOneWidget);
     expect(find.text('Enter your password.'), findsOneWidget);
@@ -28,7 +28,7 @@ void main() {
   });
 
   testWidgets('password checks each required character type', (tester) async {
-    await tester.pumpWidget(const LmsApp());
+    await tester.pumpWidget(const LmsApp(initialRoute: '/'));
     await tester.enterText(
       find.byType(TextFormField).first,
       'learner@example.com',
@@ -47,10 +47,10 @@ void main() {
     }
   });
 
-  testWidgets('visibility, local login, all placeholder routes and back work', (
+  testWidgets('visibility, local login, all role dashboards and back work', (
     tester,
   ) async {
-    await tester.pumpWidget(const LmsApp());
+    await tester.pumpWidget(const LmsApp(initialRoute: '/'));
     await tester.enterText(
       find.byType(TextFormField).first,
       ' learner@example.com ',
@@ -66,7 +66,6 @@ void main() {
     await submit(tester);
     expect(find.text('Home'), findsOneWidget);
     for (final title in [
-      'Onboarding',
       'Student dashboard',
       'Instructor dashboard',
       'Admin dashboard',
@@ -74,8 +73,8 @@ void main() {
       await tester.ensureVisible(find.text(title));
       await tester.tap(find.text(title));
       await tester.pumpAndSettle();
-      expect(find.text('Route preview'), findsOneWidget);
-      await tester.tap(find.text('Back to Home'));
+      expect(find.text('Preview dashboard · Sample data'), findsOneWidget);
+      await tester.pageBack();
       await tester.pumpAndSettle();
       expect(find.text('Home'), findsOneWidget);
     }
@@ -98,7 +97,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     addTearDown(tester.view.resetViewInsets);
-    await tester.pumpWidget(const LmsApp());
+    await tester.pumpWidget(const LmsApp(initialRoute: '/'));
     final context = tester.element(find.byType(Scaffold));
     expect(Theme.of(context).textTheme.bodyMedium!.fontFamily, 'LmsRoboto');
     expect(find.byType(Image), findsOneWidget);

@@ -17,12 +17,13 @@ The backend is the source of truth for permissions, validation, quiz scores, ass
 
 ## Current implementation status
 
-Day 2 is implemented: local form validation, Login-to-Home navigation, named placeholder routes for onboarding and Student/Instructor/Admin dashboards, a shared Material theme, reusable widgets, and bundled image/font assets.
+Day 3 is implemented: a splash screen, three-page onboarding with PageView, Student/Instructor/Admin dashboard shells, shared feedback states, and role-specific sample data separated from presentation.
 
-Use any valid email address and a password of at least 8 characters containing uppercase, lowercase, a number and a special character to open the local preview. This validates input only and does not authenticate an account. Home exposes all placeholder routes for development previews. Real role routing, full dashboards, onboarding and API integration remain scheduled for later days.
+Launch flow: Splash → Onboarding → Login → Home role preview → Dashboard. Skip and Get started clear the entry routes; Back on onboarding returns to the preceding page and cannot reopen the splash. Onboarding appears on every fresh launch for this preview; persistence and real session routing are later work.
 
-Formatting, analysis and three widget tests pass. See `docs/day_02.md` for scope and verification.
+Use any valid email address and a password of at least 8 characters containing uppercase, lowercase, a number and a special character to open the local preview. This validates input only and does not authenticate an account. Home exposes all three dashboard roles. Dashboard navigation and shortcuts open explicit coming-soon states.
 
+Formatting, analysis and 10 widget tests pass. See `docs/day_03.md` for scope and verification.
 ## Technology and prerequisites
 
 | Component | Usage |
@@ -301,7 +302,7 @@ During initial verification, formatting and analysis passed, both UI tests passe
 
 ## Planned development
 
-The remaining application work includes full onboarding, role-based dashboards, secure API/session handling, account recovery, student learning and assessment workflows, instructor content management, administrator tools and full workflow testing.
+The remaining application work includes API-backed role dashboards, secure API/session handling, account recovery, student learning and assessment workflows, instructor content management, administrator tools and full workflow testing.
 
 These are planned capabilities. Update the current implementation status as features are completed, and keep internal progress evidence in the appropriate authorized location.
 

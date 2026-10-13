@@ -18,8 +18,7 @@ class HomeScreen extends StatelessWidget {
             children: [
               const SectionHeader(
                 title: 'Explore Flutter LMS',
-                subtitle:
-                    'Preview the routes prepared for your learning platform.',
+                subtitle: 'Choose a role to explore your dashboard.',
               ),
               const SizedBox(height: 20),
               const AppMessage(
@@ -30,7 +29,6 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     for (final entry in const {
-                      'Onboarding': AppRoutes.onboarding,
                       'Student dashboard': AppRoutes.student,
                       'Instructor dashboard': AppRoutes.instructor,
                       'Admin dashboard': AppRoutes.admin,
@@ -46,7 +44,11 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 24),
               PrimaryButton(
                 label: 'Back to login',
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  AppRoutes.login,
+                  (_) => false,
+                ),
               ),
             ],
           ),
