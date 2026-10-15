@@ -17,6 +17,8 @@ The backend is the source of truth for permissions, validation, quiz scores, ass
 
 ## Current implementation status
 
+Day 4 core API foundation is added; backend health and emulator HTTP connectivity are verified. See `docs/day_04.md` for completed checks and the remaining Postman/account blockers. The login UI still uses the Day 3 local preview.
+
 Day 3 is implemented: a splash screen, three-page onboarding with PageView, Student/Instructor/Admin dashboard shells, shared feedback states, and role-specific sample data separated from presentation.
 
 Launch flow: Splash → Onboarding → Login → Home role preview → Dashboard. Skip and Get started clear the entry routes; Back on onboarding returns to the preceding page and cannot reopen the splash. Onboarding appears on every fresh launch for this preview; persistence and real session routing are later work. The existing UI structure follows the integration guide’s feature folders and shared core components.
@@ -33,7 +35,7 @@ Formatting, analysis and 10 widget tests pass. See `docs/day_03.md` for scope an
 | Git | Version control using the supplied Conventional Commits guide. |
 | Docker Desktop | Runs the supplied LMS backend for API development. |
 | Postman Desktop | Verifies backend requests before Flutter integration. |
-| Dio, secure storage and Provider | Planned networking, session storage and state-management components; not installed or implemented in this version. |
+| Dio, secure storage and Provider | Installed for the Day 4 core network and secure-storage foundation. |
 
 The instructions below target a Windows PC running the app in an Android emulator. Only the Android platform is currently included in the repository.
 
@@ -195,6 +197,7 @@ The helper temporarily uses `.build-tmp` for Java's temporary files to avoid the
 | CMake 4.1.2 or the NDK is missing | Install the requested version through SDK Manager with Show Package Details enabled. |
 | Java loopback connection error | Use `./scripts/run_android.ps1`, which selects a project-local temporary folder. |
 | Paging file too small / Java or Dart out of memory | Close unnecessary applications. Use the helper and run tests after the build finishes. These errors indicate PC memory pressure; the helper cannot guarantee a build if the system has no memory available. |
+| Kotlin `Could not close incremental caches` while compiling an Android plugin | This Windows setup disables Kotlin incremental compilation with `kotlin.incremental=false` in `android/gradle.properties`. Keep this setting when running `flutter run`; Kotlin compilation may take longer. |
 | PowerShell blocks the helper script | Use the normal Flutter command from an ordinary terminal, or use an execution policy approved for your PC. On managed PCs, ask your administrator. |
 | Visual Studio warning in Flutter Doctor | This project targets Android. Missing Windows C++ desktop tools do not block the Android target. |
 | Login does not open a dashboard | Use a valid email and 8 or more password characters to open Home. Dashboard routes are placeholders; API authentication is scheduled later. |
