@@ -4,14 +4,24 @@ import '../constants/api_endpoints.dart';
 import '../storage/token_storage.dart';
 
 class AuthInterceptor extends Interceptor {
-  AuthInterceptor(this.dio, this.refreshDio, this.storage);
+  AuthInterceptor(
+    this.dio,
+    this.refreshDio,
+    this.storage, {
+    this.onSessionExpired,
+  });
+  final void Function()? onSessionExpired;
   final Dio dio;
   final Dio refreshDio;
   final TokenStorage storage;
   Future<String?>? _refreshing;
   bool _public(RequestOptions request) =>
       request.extra['requiresAuth'] == false ||
-      request.path.startsWith('/api/v1/auth/');
+      (request.path.startsWith('/api/v1/auth/') &&
+          ![
+            '/api/v1/auth/logout',
+            '/api/v1/auth/logout-all',
+          ].contains(request.path));
 
   @override
   void onRequest(
@@ -34,6 +44,7 @@ class AuthInterceptor extends Interceptor {
       final token = await storage.readRefreshToken();
       if (token == null) {
         await storage.clear();
+        onSessionExpired?.call();
         return null;
       }
       final response = await refreshDio.post<dynamic>(
@@ -54,6 +65,7 @@ class AuthInterceptor extends Interceptor {
       return access;
     } catch (_) {
       await storage.clear();
+      onSessionExpired?.call();
       return null;
     }
   }
@@ -62,6 +74,12 @@ class AuthInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     final error = err;
     final request = error.requestOptions;
+    if (error.response?.statusCode == 401 &&
+        !_public(request) &&
+        request.extra['authRetried'] == true) {
+      await storage.clear();
+      onSessionExpired?.call();
+    }
     if (error.response?.statusCode != 401 ||
         _public(request) ||
         request.extra['authRetried'] == true) {

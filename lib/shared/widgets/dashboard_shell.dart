@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../features/profile/screens/profile_screen.dart';
+
 import '../models/dashboard_models.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../core/widgets/app_widgets.dart';
@@ -543,7 +545,9 @@ class _DashboardShellState extends State<DashboardShell> {
         ],
       ),
       body: SafeArea(
-        child: _selected != 0
+        child: _selected == 3
+            ? const ProfileScreen()
+            : _selected != 0
             ? EmptyState(
                 title: data.destinations[_selected],
                 message:

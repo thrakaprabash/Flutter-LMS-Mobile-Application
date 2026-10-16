@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../shared/providers/auth_provider.dart';
 
 import '../../../core/routing/route_names.dart';
 
@@ -15,11 +18,21 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer(const Duration(milliseconds: 1200), () {
+    _timer = Timer(const Duration(milliseconds: 1200), () async {
+      final auth = context.read<AuthProvider>();
+      await auth.restore();
+      if (!mounted) return;
+      if (auth.restoreError != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute<void>(builder: (_) => const SessionRestoreScreen()),
+        );
+        return;
+      }
       if (mounted) {
         Navigator.pushNamedAndRemoveUntil(
           context,
-          RouteNames.onboarding,
+          auth.authenticated ? auth.route : RouteNames.onboarding,
           (_) => false,
         );
       }
@@ -233,4 +246,56 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ),
     ),
   );
+}
+
+class SessionRestoreScreen extends StatelessWidget {
+  const SessionRestoreScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(auth.restoreError ?? 'Restoring session…'),
+              if (auth.restoring) const CircularProgressIndicator(),
+              FilledButton(
+                onPressed: auth.restoring
+                    ? null
+                    : () async {
+                        await auth.restore();
+                        if (context.mounted && auth.restoreError == null) {
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            auth.route,
+                            (_) => false,
+                          );
+                        }
+                      },
+                child: const Text('Retry'),
+              ),
+              TextButton(
+                onPressed: auth.restoring
+                    ? null
+                    : () async {
+                        await auth.invalidate();
+                        if (context.mounted) {
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            '/',
+                            (_) => false,
+                          );
+                        }
+                      },
+                child: const Text('Sign in again'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

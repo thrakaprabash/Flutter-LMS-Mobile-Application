@@ -6,10 +6,19 @@ import 'api_exception.dart';
 import 'auth_interceptor.dart';
 
 class ApiClient {
-  ApiClient(TokenStorage storage, {Dio? client, Dio? refreshClient})
-    : dio = client ?? Dio(options()) {
+  ApiClient(
+    TokenStorage storage, {
+    Dio? client,
+    Dio? refreshClient,
+    void Function()? onSessionExpired,
+  }) : dio = client ?? Dio(options()) {
     dio.interceptors.add(
-      AuthInterceptor(dio, refreshClient ?? Dio(options()), storage),
+      AuthInterceptor(
+        dio,
+        refreshClient ?? Dio(options()),
+        storage,
+        onSessionExpired: onSessionExpired,
+      ),
     );
     dio.interceptors.add(
       InterceptorsWrapper(

@@ -1,10 +1,16 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+
+import '../../demo/demo_screen.dart';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../../../core/routing/route_names.dart';
-import '../../../core/widgets/app_widgets.dart';
+import '../../../shared/providers/auth_provider.dart';
 import '../../../core/utils/validators.dart';
+import '../widgets/auth_layout.dart';
+import 'recovery_registration_screen.dart';
 
-/// Day 2 local validation only; no API authentication or session is created.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
   @override
@@ -16,7 +22,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   bool _obscurePassword = true;
-
+  bool _busy = false;
+  bool _needsVerification = false;
+  String? _error;
   @override
   void dispose() {
     _email.dispose();
@@ -24,131 +32,167 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _submit() {
-    if (!_formKey.currentState!.validate()) return;
+  void openFlow({bool register = false, bool verify = false}) {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => RecoveryRegistrationScreen(
+          register: register,
+          verify: verify,
+          initialEmail: _email.text.trim(),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _submit() async {
+    if (_busy || !_formKey.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
-    // Do not pass credentials through routes or persist preview passwords.
-    _password.clear();
-    setState(() => _obscurePassword = true);
-    Navigator.pushNamed(context, RouteNames.home);
+    setState(() {
+      _busy = true;
+      _error = null;
+      _needsVerification = false;
+    });
+    try {
+      final auth = context.read<AuthProvider>();
+      await auth.accept(
+        await auth.service.auth('login', {
+          'email': _email.text.trim(),
+          'password': _password.text,
+        }),
+      );
+      _password.clear();
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(context, auth.route, (_) => false);
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          _error = AuthProvider.message(error);
+          final data = error is DioException ? error.response?.data : null;
+          final code = data is Map ? data['errorCode']?.toString() ?? '' : '';
+          _needsVerification =
+              code.contains('UNVERIFIED') ||
+              code.contains('NOT_VERIFIED') ||
+              (_error!.toLowerCase().contains('verif') &&
+                  !_error!.toLowerCase().contains('suspend'));
+          if (code == 'ACCOUNT_SUSPENDED') _error = 'Your account is suspended. Contact your LMS administrator to restore access.';
+        });
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    body: SafeArea(
-      child: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 440),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.school_outlined,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 30,
-                    ),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: Text(
-                        'Flutter LMS',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: AspectRatio(
-                    aspectRatio: 1.6,
-                    child: Image.asset(
-                      'assets/images/university-students.png',
-                      fit: BoxFit.cover,
-                      semanticLabel:
-                          'University students studying together on campus',
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Your next chapter\nstarts here.',
-                  style: Theme.of(context).textTheme.headlineLarge,
-                ),
-                const SizedBox(height: 10),
-                const Text('Learn together. Go further.'),
-                const SizedBox(height: 24),
-                Card(
-                  elevation: 8,
-                  shadowColor: const Color(0x14285C50),
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Form(
-                      key: _formKey,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const SectionHeader(
-                            title: 'Welcome back',
-                            subtitle: 'Your learning journey continues here.',
-                          ),
-                          const SizedBox(height: 28),
-                          AppInputField(
-                            controller: _email,
-                            label: 'Email address',
-                            hint: 'you@example.com',
-                            icon: Icons.mail_outline,
-                            keyboardType: TextInputType.emailAddress,
-                            validator: Validators.email,
-                          ),
-                          const SizedBox(height: 20),
-                          AppInputField(
-                            controller: _password,
-                            label: 'Password',
-                            hint: 'Your password',
-                            icon: Icons.lock_outline,
-                            obscureText: _obscurePassword,
-                            textInputAction: TextInputAction.done,
-                            onSubmitted: (_) => _submit(),
-                            validator: Validators.previewPassword,
-                            suffixIcon: IconButton(
-                              tooltip: _obscurePassword
-                                  ? 'Show password'
-                                  : 'Hide password',
-                              onPressed: () => setState(
-                                () => _obscurePassword = !_obscurePassword,
-                              ),
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 26),
-                          PrimaryButton(label: 'Log in', onPressed: _submit),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'For students, instructors and admins',
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Preview only: use any valid email. Password needs 8+ characters with uppercase, lowercase, a number and a special character. No real credentials needed.',
-                  textAlign: TextAlign.center,
-                ),
-              ],
+  Widget build(BuildContext context) => AuthLayout(
+    title: 'Welcome back',
+    subtitle: 'Sign in to continue your learning journey.',
+    icon: Icons.login_rounded,
+    child: AutofillGroup(
+      child: Form(
+        key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'YOUR ACCOUNT',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.5,
+              ),
             ),
-          ),
+            const SizedBox(height: 20),
+            TextFormField(
+              controller: _email,
+              enabled: !_busy,
+              autofillHints: const [
+                AutofillHints.username,
+                AutofillHints.email,
+              ],
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              autocorrect: false,
+              decoration: const InputDecoration(
+                labelText: 'Email address',
+                hintText: 'you@example.com',
+                prefixIcon: Icon(Icons.mail_outline),
+              ),
+              validator: Validators.email,
+            ),
+            const SizedBox(height: 20),
+            TextFormField(
+              controller: _password,
+              enabled: !_busy,
+              autofillHints: const [AutofillHints.password],
+              obscureText: _obscurePassword,
+              autocorrect: false,
+              enableSuggestions: false,
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (_) => _submit(),
+              validator: (v) =>
+                  v == null || v.isEmpty ? 'Enter your password.' : null,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                prefixIcon: const Icon(Icons.lock_outline),
+                suffixIcon: IconButton(
+                  tooltip: _obscurePassword ? 'Show password' : 'Hide password',
+                  onPressed: _busy
+                      ? null
+                      : () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
+                  icon: Icon(
+                    _obscurePassword
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                  ),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: _busy ? null : () => openFlow(),
+                child: const Text('Forgot password?'),
+              ),
+            ),
+            if (_error != null) AuthFeedback(message: _error!),
+            if (_needsVerification)
+              TextButton(
+                onPressed: _busy ? null : () => openFlow(verify: true),
+                child: const Text('Verify email'),
+              ),
+            AuthSubmitButton(label: 'Log in', busy: _busy, onPressed: _submit),
+            const SizedBox(height: 20),
+            const Divider(),
+            const SizedBox(height: 8),
+            if (kDebugMode)
+              OutlinedButton.icon(
+                onPressed: _busy
+                    ? null
+                    : () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => const DemoPickerScreen(),
+                        ),
+                      ),
+                icon: const Icon(Icons.science_outlined),
+                label: const Text('Explore viva demo'),
+              ),
+            const Text('New to Flutter LMS?', textAlign: TextAlign.center),
+            TextButton(
+              onPressed: _busy ? null : () => openFlow(register: true),
+              child: const Text('Create an account'),
+            ),
+            const Text(
+              'One login for students, instructors and admins.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12),
+            ),
+          ],
         ),
       ),
     ),

@@ -14,7 +14,7 @@ class ApiException implements Exception {
   factory ApiException.fromDio(DioException error) {
     final body = error.response?.data;
     final map = body is Map ? body : const {};
-    final message = switch (error.type) {
+    var message = switch (error.type) {
       DioExceptionType.connectionTimeout ||
       DioExceptionType.sendTimeout ||
       DioExceptionType.receiveTimeout =>
@@ -29,6 +29,24 @@ class ApiException implements Exception {
             ? map['message'] as String
             : 'The request failed. Please try again.',
     };
+    final status = error.response?.statusCode;
+    if (status != null && status >= 500) {
+      message =
+          'The server could not complete the request. Please try again later.';
+    } else if (status == 422 && map['details'] is List) {
+      final fields = (map['details'] as List)
+          .whereType<Map>()
+          .map((item) => item['field']?.toString().split('.').last)
+          .whereType<String>()
+          .map(
+            (field) => field.replaceAllMapped(
+              RegExp('[A-Z]'),
+              (m) => ' ${m[0]!.toLowerCase()}',
+            ),
+          )
+          .toSet();
+      if (fields.isNotEmpty) message = 'Please check: ${fields.join(', ')}.';
+    }
     return ApiException(
       message: message,
       statusCode: error.response?.statusCode,

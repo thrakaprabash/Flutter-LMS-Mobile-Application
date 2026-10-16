@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_lms/app.dart';
+
+import 'test_app.dart';
+
 import 'package:flutter_lms/core/widgets/app_state_view.dart';
 import 'package:flutter_lms/core/widgets/app_loading.dart';
 import 'package:flutter_lms/core/widgets/app_error_view.dart';
@@ -11,7 +13,7 @@ void main() {
   testWidgets('splash, swipe, back, and completion clear entry routes', (
     tester,
   ) async {
-    await tester.pumpWidget(const LmsApp());
+    await tester.pumpWidget(testApp());
     expect(find.text('Flutter LMS'), findsOneWidget);
     await tester.pump(const Duration(milliseconds: 1200));
     await tester.pumpAndSettle();
@@ -37,7 +39,7 @@ void main() {
   });
 
   testWidgets('skip clears onboarding and splash', (tester) async {
-    await tester.pumpWidget(const LmsApp());
+    await tester.pumpWidget(testApp());
     await tester.pump(const Duration(milliseconds: 1200));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Skip'));
@@ -59,7 +61,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
       tester.platformDispatcher.textScaleFactorTestValue = 1.5;
       addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-      await tester.pumpWidget(LmsApp(initialRoute: route));
+      await tester.pumpWidget(testApp(initialRoute: route));
       await tester.pumpAndSettle();
       expect(find.text('Preview dashboard · Sample data'), findsOneWidget);
       final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));

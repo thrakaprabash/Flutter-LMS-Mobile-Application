@@ -341,3 +341,7 @@ GitHub repository creation, commits and pushing are handled manually by the deve
 - Use HTTPS for deployed API connections. Local HTTP addresses in this guide are development examples only.
 
 The installation links in this README point only to public software vendors and public tooling documentation. No internal data-resource links or shared conversation links are included.
+
+## Current milestone: Day 5
+
+Authentication, sessions, password recovery and profile forms now use the real backend. See [Day 5 verification and remaining acceptance checks](docs/day_05.md). Earlier Day 1-4 preview descriptions are historical.

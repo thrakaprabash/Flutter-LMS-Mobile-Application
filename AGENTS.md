@@ -1,10 +1,14 @@
 # Current milestone and scope
 
-The user has explicitly limited work to Day 3 of the Flutter LMS 10-day task plan.
+Updated user instruction on 16 October 2026: retain isolated debug-only demo access for development while shared backend accounts are suspended. This supersedes the earlier instruction to remove demo before the 3:00 PM viva. When supervisors restore backend access, verify the real integrations and remove demo entry points, service/provider, local photo state and demo-dependent tests. Never use demo roles as real authorization, automatically fall back to demo after login failure, or change real credentials to bypass suspension. Real backend integration stays connected throughout.
 
-- Follow the supplied integration guide for the structure of implemented Day 1-3 code.
-- Preserve the current green theme, onboarding illustrations, local login preview and three role dashboard shells.
-- Do not start Day 4 or later work unless the user explicitly authorizes advancing beyond Day 3.
-- In particular, do not add API packages, backend/Docker/Postman setup, networking, secure token storage, authentication/session integration, Android network configuration or later business features as part of a Day 3 cleanup.
-- Keep sample data separate from reusable UI. Create services, providers and future feature folders when the corresponding implementation is authorized, rather than adding empty scaffolding.
+The user explicitly authorized Day 5 on 15 October 2026: real backend authentication, session management, password recovery and profiles.
+
+- Follow the supplied API integration guide, Backend API Report, Postman collection and Day 5 task plan.
+- Preserve the green theme, onboarding illustrations and three role dashboard shells. Dashboard course data remains a clearly labelled preview until its later milestone.
+- Public login must authenticate against the backend; protected routes use the returned role. Never restore local preview login or expose a role switcher as authorization.
+- Keep passwords, OTPs and tokens out of source, tests, documentation and logs. Store session tokens only through secure storage.
+- Do not advance into Day 6 business features unless requested.
+- Do not change suspended accounts or backend/database configuration to bypass authentication rules.
+- Keep sample data separate from reusable UI and feature services/providers.
 - Git commits and pushing remain manual unless explicitly requested.
