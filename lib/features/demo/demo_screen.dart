@@ -8,11 +8,13 @@ import '../auth/services/account_service.dart';
 import '../student/dashboard/screens/student_home_screen.dart';
 import '../instructor/dashboard/screens/instructor_home_screen.dart';
 import '../admin/dashboard/screens/admin_home_screen.dart';
+import 'demo_activity_data.dart';
 
 /// An isolated in-memory account service. Never forwards requests to Dio.
 class DemoAccountService extends AccountService {
   DemoAccountService(super.client, String role) {
     user = {
+      'id': 'demo-user',
       'firstName': 'Alex',
       'lastName': 'Taylor',
       'email': 'alex@example.com',
@@ -38,6 +40,7 @@ class DemoAccountService extends AccountService {
   }
   late Map<String, dynamic> user;
   Map<String, dynamic>? profile;
+  final activity = DemoActivityData();
   @override
   Future<Map<String, dynamic>> request(
     String method,
@@ -69,6 +72,8 @@ class DemoAccountService extends AccountService {
       profile = {...?profile, ...data};
       return {'message': 'Demo profile saved locally.'};
     }
+    final sample = activity.handle(method, path, data);
+    if (sample != null) return sample;
     // Media, authentication and other APIs deliberately have no demo transport.
     throw const FormatException('This action is unavailable in demo mode.');
   }

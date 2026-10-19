@@ -350,6 +350,10 @@ Authentication, sessions, password recovery and profile forms now use the real b
 
 Student course browsing, search, category filtering, pagination, enrollment, My Courses, curriculum, lesson viewing and server-returned progress are implemented. Debug demo sessions use the same screens with isolated in-memory learning data. See [Day 6 verification and remaining acceptance checks](docs/day_06.md). Day 1-5 milestone descriptions above are historical.
 
+## Current milestone: Day 7
+
+Student quizzes, assignment submissions/corrections, course reviews, notifications with unread counts, and profile learning summaries are implemented. See [Day 7 implementation and acceptance checks](docs/day_07.md). Real grading and statuses remain backend-controlled; debug demo data stays isolated. Earlier milestone descriptions are historical.
+
 ### Rebuilding after native package changes
 
 After adding or changing packages such as `video_player` or `url_launcher`, stop the running app and perform a full Android build/install with `./scripts/run_android.ps1`. Hot reload/restart cannot install native plugins into an older APK. If video playback reports a platform-channel connection error, rebuild/reinstall before investigating the media URL. The helper retains the installed app's local data.

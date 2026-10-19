@@ -11,6 +11,11 @@ import 'learning_service.dart';
 import 'learning_widgets.dart';
 import 'lesson_video_player.dart';
 import 'demo_learning_service.dart';
+import '../assessments/activity_widgets.dart';
+import '../assessments/assignment_screen.dart';
+import '../assessments/quiz_screen.dart';
+import '../assessments/reviews_screen.dart';
+import '../assessments/notifications_screen.dart';
 
 Widget learningScope(BuildContext context, Widget child) =>
     ChangeNotifierProvider<AuthProvider>.value(
@@ -69,6 +74,7 @@ class _LearningHomeState extends State<_LearningHome> {
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       title: Text(['Browse courses', 'My courses', 'Profile'][tab]),
+      actions: const [NotificationBell()],
     ),
     bottomNavigationBar: NavigationBar(
       selectedIndex: tab,
@@ -552,6 +558,84 @@ class _CourseDetailsState extends State<CourseDetails> {
                 icon: const Icon(Icons.school_outlined),
                 label: const Text('Enroll now'),
               ),
+            const SizedBox(height: 24),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (enrolled) ...[
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.quiz_outlined),
+                    label: const Text('Quizzes'),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => learningScope(
+                          context,
+                          ActivityList(
+                            title: 'Course quizzes',
+                            path: '/api/v1/courses/${widget.courseId}/quizzes',
+                            listKey: 'quizzes',
+                            onOpen: (ctx, q) => Navigator.push(
+                              ctx,
+                              MaterialPageRoute<void>(
+                                builder: (_) => learningScope(
+                                  ctx,
+                                  QuizScreen(id: recordId(q)),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.assignment_outlined),
+                    label: const Text('Assignments'),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => learningScope(
+                          context,
+                          ActivityList(
+                            title: 'Course assignments',
+                            path:
+                                '/api/v1/courses/${widget.courseId}/assignments',
+                            listKey: 'assignments',
+                            onOpen: (ctx, a) => Navigator.push(
+                              ctx,
+                              MaterialPageRoute<void>(
+                                builder: (_) => learningScope(
+                                  ctx,
+                                  AssignmentScreen(id: recordId(a)),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.star_outline),
+                  label: const Text('Reviews'),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => learningScope(
+                        context,
+                        ReviewsScreen(
+                          courseId: widget.courseId,
+                          eligible: enrolled,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 24),
             Text('Curriculum', style: Theme.of(context).textTheme.titleLarge),
             if (curriculumError != null) ...[

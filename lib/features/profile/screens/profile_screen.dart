@@ -11,6 +11,8 @@ import 'package:mime/mime.dart';
 
 import '../../../shared/providers/auth_provider.dart';
 import '../../../core/network/api_exception.dart';
+import '../../assessments/student_learning_summary.dart';
+import '../../learning/learning_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -436,6 +438,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Text('My profile', style: Theme.of(context).textTheme.headlineMedium),
           Text('${auth.user?['email'] ?? ''} · ${auth.role ?? ''}'),
           const SizedBox(height: 20),
+          if (auth.role == 'STUDENT' &&
+              context.watch<LearningService?>() != null)
+            const StudentLearningSummary(),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(20),
