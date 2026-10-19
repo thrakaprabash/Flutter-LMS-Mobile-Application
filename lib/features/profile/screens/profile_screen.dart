@@ -28,6 +28,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _messageIsError = false;
   TextEditingController field(String key) =>
       _fields.putIfAbsent(key, TextEditingController.new);
+
+  // Birthdays are calendar dates: preserve the returned date without a timezone conversion.
+  String dateOnly(Object? value) {
+    final text = value?.toString() ?? '';
+    return RegExp(r'^\d{4}-\d{2}-\d{2}').hasMatch(text)
+        ? text.substring(0, 10)
+        : text;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -47,7 +56,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await auth.loadProfile();
     if (!mounted) return;
     for (final entry in {...?auth.user, ...?auth.profile}.entries) {
-      field(entry.key).text = entry.value is List
+      field(entry.key).text = entry.key == 'dateOfBirth'
+          ? dateOnly(entry.value)
+          : entry.value is List
           ? (entry.value as List).join(', ')
           : entry.value?.toString() ?? '';
     }
@@ -106,7 +117,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           : key == 'bio' && text.isEmpty
           ? null
           : text;
-      final previous = original?[key];
+      final previous = key == 'dateOfBirth'
+          ? dateOnly(original?[key])
+          : original?[key];
       if ((previous is List
               ? previous.join(', ')
               : previous?.toString() ?? '') !=
