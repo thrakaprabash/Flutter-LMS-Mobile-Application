@@ -345,3 +345,11 @@ The installation links in this README point only to public software vendors and 
 ## Current milestone: Day 5
 
 Authentication, sessions, password recovery and profile forms now use the real backend. See [Day 5 verification and remaining acceptance checks](docs/day_05.md). Earlier Day 1-4 preview descriptions are historical.
+
+## Current milestone: Day 6
+
+Student course browsing, search, category filtering, pagination, enrollment, My Courses, curriculum, lesson viewing and server-returned progress are implemented. Debug demo sessions use the same screens with isolated in-memory learning data. See [Day 6 verification and remaining acceptance checks](docs/day_06.md). Day 1-5 milestone descriptions above are historical.
+
+### Rebuilding after native package changes
+
+After adding or changing packages such as `video_player` or `url_launcher`, stop the running app and perform a full Android build/install with `./scripts/run_android.ps1`. Hot reload/restart cannot install native plugins into an older APK. If video playback reports a platform-channel connection error, rebuild/reinstall before investigating the media URL. The helper retains the installed app's local data.

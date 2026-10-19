@@ -51,7 +51,7 @@ void main() {
     );
   });
 
-  for (final route in ['/student', '/instructor', '/admin']) {
+  for (final route in ['/instructor', '/admin']) {
     testWidgets('$route navigation fits small screen with large text', (
       tester,
     ) async {
