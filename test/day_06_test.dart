@@ -185,6 +185,11 @@ void main() {
       expect(find.text('Lesson completed'), findsOneWidget);
       await tester.pageBack();
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.textContaining('33.3%'),
+        -200,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.textContaining('33.3%'), findsOneWidget);
       await tester.scrollUntilVisible(
         find.text('Getting started'),

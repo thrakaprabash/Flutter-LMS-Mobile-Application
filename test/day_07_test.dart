@@ -216,13 +216,20 @@ void main() {
     );
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'Helpful course');
+    await tester.ensureVisible(find.byTooltip('Rate 4 stars'));
+    await tester.tap(find.byTooltip('Rate 4 stars'));
+    await tester.pumpAndSettle();
+    expect(find.text('Very good · 4 out of 5'), findsOneWidget);
+    await tester.ensureVisible(find.text('Submit review'));
     await tester.tap(find.text('Submit review'));
     await tester.pumpAndSettle();
     expect(find.text('Edit your review'), findsOneWidget);
     await tester.enterText(find.byType(TextField), 'Updated review');
+    await tester.ensureVisible(find.text('Update review'));
     await tester.tap(find.text('Update review'));
     await tester.pumpAndSettle();
     expect(service.activity.reviews, hasLength(1));
     expect(service.activity.reviews.single['comment'], 'Updated review');
+    expect(service.activity.reviews.single['rating'], 4);
   });
 }

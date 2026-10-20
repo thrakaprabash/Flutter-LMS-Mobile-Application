@@ -9,6 +9,7 @@ import '../../shared/providers/auth_provider.dart';
 import '../profile/screens/profile_screen.dart';
 import 'learning_service.dart';
 import 'learning_widgets.dart';
+import 'course_detail_widgets.dart';
 import 'lesson_video_player.dart';
 import 'demo_learning_service.dart';
 import '../assessments/activity_widgets.dart';
@@ -492,167 +493,262 @@ class _CourseDetailsState extends State<CourseDetails> {
     if (mounted) load();
   }
 
+  void openActivity(String type) {
+    final isQuiz = type == 'Quizzes';
+    final Widget child = type == 'Reviews'
+        ? ReviewsScreen(courseId: widget.courseId, eligible: enrolled)
+        : ActivityList(
+            title: 'Course ${type.toLowerCase()}',
+            path:
+                '/api/v1/courses/${widget.courseId}/${isQuiz ? 'quizzes' : 'assignments'}',
+            listKey: isQuiz ? 'quizzes' : 'assignments',
+            onOpen: (ctx, item) => Navigator.push(
+              ctx,
+              MaterialPageRoute<void>(
+                builder: (_) => learningScope(
+                  ctx,
+                  isQuiz
+                      ? QuizScreen(id: recordId(item))
+                      : AssignmentScreen(id: recordId(item)),
+                ),
+              ),
+            ),
+          );
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(builder: (_) => learningScope(context, child)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = course;
     final p = object(progress?['enrollment'] ?? progress);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
     return Scaffold(
-      appBar: AppBar(title: const Text('Course details')),
+      appBar: AppBar(
+        title: const Text('Course details'),
+        actions: [
+          IconButton(
+            tooltip: 'Refresh course',
+            onPressed: busy ? null : load,
+            icon: const Icon(Icons.refresh_rounded),
+          ),
+        ],
+      ),
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
-          if (busy) const LinearProgressIndicator(),
-          if (error != null) ...[
-            Text(error!),
-            TextButton(
-              onPressed: busy ? null : load,
-              child: const Text('Retry'),
+          if (busy)
+            const Padding(
+              padding: EdgeInsets.only(bottom: 16),
+              child: LinearProgressIndicator(),
             ),
-          ],
-          if (c != null) ...[
-            if (c['thumbnailUrl'] is String)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Image.network(
-                  c['thumbnailUrl'],
-                  height: 180,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                ),
-              ),
-            const SizedBox(height: 16),
-            Text(
-              '${c['title']}',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const SizedBox(height: 12),
-            Text('Overview', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            Text('${c['description'] ?? ''}'),
-            const SizedBox(height: 12),
-            Text('Instructor: ${instructorName(c)}'),
-            Text('${c['level'] ?? ''} · ${c['language'] ?? ''}'),
-            for (final outcome
-                in (c['learningOutcomes'] is List
-                    ? c['learningOutcomes'] as List
-                    : []))
-              Text('• $outcome'),
-            const SizedBox(height: 16),
-            if (enrolled) ...[
-              Text(friendlyStatus('${p['status'] ?? 'Enrolled'}')),
-              if (progressError != null) Text(progressError!),
-              const SizedBox(height: 8),
-              CourseProgress(
-                value: p['progressPercentage'],
-                onRetry: busy ? null : load,
-              ),
-              const SizedBox(height: 16),
-              FilledButton.icon(
-                onPressed: busy || sections.isEmpty ? null : continueLearning,
-                icon: const Icon(Icons.play_arrow),
-                label: const Text('Continue learning'),
-              ),
-            ] else
-              FilledButton.icon(
-                onPressed: busy ? null : enroll,
-                icon: const Icon(Icons.school_outlined),
-                label: const Text('Enroll now'),
-              ),
-            const SizedBox(height: 24),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                if (enrolled) ...[
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.quiz_outlined),
-                    label: const Text('Quizzes'),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (_) => learningScope(
-                          context,
-                          ActivityList(
-                            title: 'Course quizzes',
-                            path: '/api/v1/courses/${widget.courseId}/quizzes',
-                            listKey: 'quizzes',
-                            onOpen: (ctx, q) => Navigator.push(
-                              ctx,
-                              MaterialPageRoute<void>(
-                                builder: (_) => learningScope(
-                                  ctx,
-                                  QuizScreen(id: recordId(q)),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.assignment_outlined),
-                    label: const Text('Assignments'),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (_) => learningScope(
-                          context,
-                          ActivityList(
-                            title: 'Course assignments',
-                            path:
-                                '/api/v1/courses/${widget.courseId}/assignments',
-                            listKey: 'assignments',
-                            onOpen: (ctx, a) => Navigator.push(
-                              ctx,
-                              MaterialPageRoute<void>(
-                                builder: (_) => learningScope(
-                                  ctx,
-                                  AssignmentScreen(id: recordId(a)),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+          if (error != null)
+            DetailPanel(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(error!),
+                  TextButton(
+                    onPressed: busy ? null : load,
+                    child: const Text('Retry'),
                   ),
                 ],
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.star_outline),
-                  label: const Text('Reviews'),
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => learningScope(
-                        context,
-                        ReviewsScreen(
-                          courseId: widget.courseId,
-                          eligible: enrolled,
+              ),
+            ),
+          if (c != null) ...[
+            CourseHero(course: c),
+            const SizedBox(height: 16),
+            DetailPanel(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (enrolled) ...[
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Your progress',
+                            style: theme.textTheme.titleLarge,
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colors.primaryContainer.withValues(
+                                  alpha: .5,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                friendlyStatus('${p['status'] ?? 'Enrolled'}'),
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: colors.primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ),
-              ],
+                    const SizedBox(height: 16),
+                    if (progressError != null) Text(progressError!),
+                    CourseProgress(
+                      value: p['progressPercentage'],
+                      onRetry: busy ? null : load,
+                    ),
+                    const SizedBox(height: 20),
+                    FilledButton.icon(
+                      onPressed: busy || sections.isEmpty
+                          ? null
+                          : continueLearning,
+                      icon: const Icon(Icons.play_arrow_rounded),
+                      label: const Text('Continue learning'),
+                    ),
+                  ] else ...[
+                    Text(
+                      'Start your next chapter',
+                      style: theme.textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 6),
+                    const Text('Join this course and learn at your own pace.'),
+                    const SizedBox(height: 16),
+                    FilledButton.icon(
+                      onPressed: busy ? null : enroll,
+                      icon: const Icon(Icons.school_outlined),
+                      label: const Text('Enroll now'),
+                    ),
+                  ],
+                ],
+              ),
             ),
             const SizedBox(height: 24),
-            Text('Curriculum', style: Theme.of(context).textTheme.titleLarge),
-            if (curriculumError != null) ...[
-              Text(curriculumError!),
-              TextButton(
-                onPressed: busy ? null : load,
-                child: const Text('Retry curriculum'),
+            Text('Explore this course', style: theme.textTheme.titleLarge),
+            const SizedBox(height: 12),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final columns = constraints.maxWidth >= 460 ? 3 : 2;
+                final width =
+                    (constraints.maxWidth - (columns - 1) * 12) / columns;
+                return Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    if (enrolled) ...[
+                      SizedBox(
+                        width: width,
+                        child: CourseShortcut(
+                          icon: Icons.quiz_outlined,
+                          title: 'Quizzes',
+                          subtitle: 'Check your knowledge',
+                          onTap: busy ? null : () => openActivity('Quizzes'),
+                        ),
+                      ),
+                      SizedBox(
+                        width: width,
+                        child: CourseShortcut(
+                          icon: Icons.assignment_outlined,
+                          title: 'Assignments',
+                          subtitle: 'Put learning into practice',
+                          onTap: busy
+                              ? null
+                              : () => openActivity('Assignments'),
+                        ),
+                      ),
+                    ],
+                    SizedBox(
+                      width: enrolled ? width : constraints.maxWidth,
+                      child: CourseShortcut(
+                        icon: Icons.star_outline_rounded,
+                        title: 'Reviews',
+                        subtitle: 'Hear from other learners',
+                        onTap: busy ? null : () => openActivity('Reviews'),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 24),
+            DetailPanel(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Overview', style: theme.textTheme.titleLarge),
+                  const SizedBox(height: 12),
+                  Text('${c['description'] ?? ''}'),
+                  if (c['learningOutcomes'] is List &&
+                      (c['learningOutcomes'] as List).isNotEmpty) ...[
+                    const SizedBox(height: 20),
+                    Text(
+                      'What you’ll learn',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 12),
+                    for (final outcome in c['learningOutcomes'] as List)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.check_circle_outline_rounded,
+                              size: 20,
+                              color: colors.primary,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(child: Text('$outcome')),
+                          ],
+                        ),
+                      ),
+                  ],
+                ],
               ),
-            ],
+            ),
+            const SizedBox(height: 24),
+            Text('Curriculum', style: theme.textTheme.titleLarge),
+            const SizedBox(height: 4),
+            Text(
+              '${sections.length} available ${sections.length == 1 ? 'section' : 'sections'} · Learn step by step',
+            ),
+            const SizedBox(height: 16),
+            if (curriculumError != null)
+              DetailPanel(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(curriculumError!),
+                    TextButton(
+                      onPressed: busy ? null : load,
+                      child: const Text('Retry curriculum'),
+                    ),
+                  ],
+                ),
+              ),
             if (sections.isEmpty && curriculumError == null && !busy)
-              const Text('No available sections.'),
+              const DetailPanel(child: Text('No available sections.')),
             for (final section in sections)
-              _SectionTile(
-                section: section,
-                onLesson: openLesson,
-                statuses: lessonStatuses,
-                enrolled: enrolled,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Card(
+                  clipBehavior: Clip.antiAlias,
+                  child: _SectionTile(
+                    section: section,
+                    onLesson: openLesson,
+                    statuses: lessonStatuses,
+                    enrolled: enrolled,
+                  ),
+                ),
               ),
           ],
         ],
@@ -689,6 +785,22 @@ class _SectionTileState extends State<_SectionTile> {
 
   @override
   Widget build(BuildContext context) => ExpansionTile(
+    tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+    childrenPadding: const EdgeInsets.only(bottom: 12),
+    shape: const Border(),
+    collapsedShape: const Border(),
+    leading: Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primaryContainer
+            .withValues(alpha: .5),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(
+        Icons.folder_open_rounded,
+        color: Theme.of(context).colorScheme.primary,
+      ),
+    ),
     title: Text('${widget.section['title']}'),
     subtitle: Text(
       '${widget.section['lessonCount'] ?? widget.section['totalLessons'] ?? ''} lessons',

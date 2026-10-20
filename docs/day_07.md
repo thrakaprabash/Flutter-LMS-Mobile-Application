@@ -47,3 +47,15 @@ Implemented on 19 October 2026 using the supplied Day 7 plan, Mobile API Integra
 Authenticated backend checks are still required for real quiz start/timeout/attempt limits/results; all three actual file upload variants; instructor-requested correction and graded locks; review uniqueness/ownership; notification counts and pagination; and completed-course summaries. No production quiz, submission or review was created during automated verification. Existing account suspension must be resolved by the backend owner if encountered; demo sessions never bypass backend authorization.
 
 Instructor/Admin business features remain outside Day 7. Git commit and push remain manual.
+
+## Review UI refinement - 20 October 2026
+
+Replaced the numeric dropdown with five tappable gold star icons, accessible rating labels, selected-state semantics and a descriptive rating caption. The review form now uses a spacious card, comment guidance and an icon submit/update action. Learner cards show avatars, names when returned, star ratings and comments; an illustrated empty state invites the first review. Uses native Material icons with the existing green theme. Backend rating/comment requests and ownership behavior are unchanged.
+
+Verification: static analysis passed; all seven Day 7 tests passed, including selecting four stars and preserving that rating through review creation and editing. Android rebuild succeeded and the updated app installed successfully on emulator-5554.
+
+## Course details UI refinement - 20 October 2026
+
+Added a forest-green gradient course header with instructor, level/language badges and optional thumbnail, a separate learning-progress/enrollment card, responsive assessment/review shortcut cards, an overview/outcomes panel and rounded curriculum cards with folder icons. Missing metadata stays absent; official progress still comes from the backend. Navigation and enrollment/lesson services are unchanged.
+
+Verification: analysis passed. All five Day 6 tests, all seven Day 7 tests and both learning-widget tests passed across the targeted runs. The existing end-to-end learning test now scrolls back to the relocated progress card after lesson completion. Android build succeeded and the update installed and opened on emulator-5554. The fresh launch displayed onboarding; course details device inspection remains pending navigation into a course.
