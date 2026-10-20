@@ -15,7 +15,8 @@ import '../../assessments/student_learning_summary.dart';
 import '../../learning/learning_service.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({super.key, this.onSignedOut});
+  final VoidCallback? onSignedOut;
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
@@ -289,7 +290,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await run(() async {
       await auth.logout(all: all);
       if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
+        if (widget.onSignedOut != null) {
+          widget.onSignedOut!();
+        } else {
+          Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
+        }
       }
     });
   }

@@ -51,7 +51,8 @@ void main() {
     );
   });
 
-  for (final route in ['/instructor', '/admin']) {
+  // Instructor preview was replaced with the authenticated studio in Day 8.
+  for (final route in ['/admin']) {
     testWidgets('$route navigation fits small screen with large text', (
       tester,
     ) async {

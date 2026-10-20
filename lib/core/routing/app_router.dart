@@ -7,7 +7,7 @@ import '../../features/auth/screens/login_screen.dart';
 import '../../features/home/screens/home_screen.dart';
 import '../../features/onboarding/screens/entry_screens.dart';
 import '../../features/student/dashboard/screens/student_home_screen.dart';
-import '../../features/instructor/dashboard/screens/instructor_home_screen.dart';
+import '../../features/instructor/screens/instructor_home_screen.dart';
 import '../../features/admin/dashboard/screens/admin_home_screen.dart';
 import 'route_names.dart';
 

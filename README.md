@@ -289,9 +289,10 @@ lib/
     student/dashboard/
       models/                       Student sample dashboard data
       screens/                      StudentHomeScreen
-    instructor/dashboard/
-      models/                       Instructor sample dashboard data
-      screens/                      InstructorHomeScreen
+    instructor/
+      screens/                      Instructor home, workspace and editors
+      services/                     Authenticated instructor API operations
+      widgets/                      Dashboard, detail views and shared studio UI
     admin/dashboard/
       models/                       Admin sample dashboard data
       screens/                      AdminHomeScreen
@@ -353,6 +354,10 @@ Student course browsing, search, category filtering, pagination, enrollment, My 
 ## Current milestone: Day 7
 
 Student quizzes, assignment submissions/corrections, course reviews, notifications with unread counts, and profile learning summaries are implemented. See [Day 7 implementation and acceptance checks](docs/day_07.md). Real grading and statuses remain backend-controlled; debug demo data stays isolated. Earlier milestone descriptions are historical.
+
+## Current milestone: Day 8
+
+Instructor dashboard, owned-course building, sections and lessons, media uploads, quiz/question authoring, assignment publication, learner attempts/submissions, grading/corrections, enrollments and archiving are implemented. The debug Instructor demo supports these workflows with session-local sample data and simulated uploads. Open **Explore viva demo → Instructor demo** from login. Real instructor login, dashboard and draft creation were verified after the earlier backend connectivity failure; further live acceptance remains pending. See [Day 8 verification and remaining live acceptance](docs/day_08.md). Earlier milestone descriptions are historical.
 
 ### Rebuilding after native package changes
 

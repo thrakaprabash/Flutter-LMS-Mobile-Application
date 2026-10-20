@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:dio/dio.dart' show FormData;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -6,9 +7,10 @@ import '../../core/storage/token_storage.dart';
 import '../../shared/providers/auth_provider.dart';
 import '../auth/services/account_service.dart';
 import '../student/dashboard/screens/student_home_screen.dart';
-import '../instructor/dashboard/screens/instructor_home_screen.dart';
+import '../instructor/screens/instructor_home_screen.dart';
 import '../admin/dashboard/screens/admin_home_screen.dart';
 import 'demo_activity_data.dart';
+import 'demo_instructor_data.dart';
 
 /// An isolated in-memory account service. Never forwards requests to Dio.
 class DemoAccountService extends AccountService {
@@ -41,6 +43,7 @@ class DemoAccountService extends AccountService {
   late Map<String, dynamic> user;
   Map<String, dynamic>? profile;
   final activity = DemoActivityData();
+  final instructorData = DemoInstructorData();
   @override
   Future<Map<String, dynamic>> request(
     String method,
@@ -71,6 +74,24 @@ class DemoAccountService extends AccountService {
         data is Map<String, dynamic>) {
       profile = {...?profile, ...data};
       return {'message': 'Demo profile saved locally.'};
+    }
+    if (user['role'] == 'INSTRUCTOR') {
+      if (data is FormData && progress != null) {
+        progress(0, 100);
+        await Future<void>.delayed(const Duration(milliseconds: 180));
+        progress(50, 100);
+        await Future<void>.delayed(const Duration(milliseconds: 180));
+      }
+      final sample = instructorData.handle(
+        method,
+        path,
+        data,
+        progress: progress,
+      );
+      if (sample != null) return sample;
+      throw const FormatException(
+        'This action is unavailable in instructor demo mode.',
+      );
     }
     final sample = activity.handle(method, path, data);
     if (sample != null) return sample;
@@ -131,7 +152,7 @@ class DemoPickerScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               const Text(
-                'Sample accounts only. Profile edits stay in memory and reset when you exit this demo. Photos and real account actions require backend login.',
+                'Sample accounts only. Changes stay in memory and reset with a new demo session. Instructor course building, quizzes and grading work locally; media uploads are simulated. Real account actions require backend login.',
               ),
               const SizedBox(height: 24),
               for (final role in ['STUDENT', 'INSTRUCTOR', 'ADMIN'])
@@ -177,39 +198,44 @@ class _DemoDashboard extends StatelessWidget {
   const _DemoDashboard({required this.role});
   final String role;
   @override
-  Widget build(BuildContext context) => Scaffold(
-    body: SafeArea(
-      child: Column(
-        children: [
-          Container(
-            color: Theme.of(context).colorScheme.tertiaryContainer,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
+  Widget build(BuildContext context) => role == 'INSTRUCTOR'
+      ? const InstructorHomeScreen()
+      : Scaffold(
+          body: SafeArea(
+            child: Column(
               children: [
-                const Icon(Icons.science_outlined, size: 20),
-                const SizedBox(width: 8),
-                const Expanded(
-                  child: Text(
-                    'DEMO · Sample data · Local edits only',
-                    style: TextStyle(fontSize: 12),
+                Container(
+                  color: Theme.of(context).colorScheme.tertiaryContainer,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.science_outlined, size: 20),
+                      const SizedBox(width: 8),
+                      const Expanded(
+                        child: Text(
+                          'DEMO · Sample data · Local edits only',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Exit demo'),
+                      ),
+                    ],
                   ),
                 ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Exit demo'),
+                Expanded(
+                  child: switch (role) {
+                    'STUDENT' => const StudentHomeScreen(),
+                    'INSTRUCTOR' => const InstructorHomeScreen(),
+                    _ => const AdminHomeScreen(),
+                  },
                 ),
               ],
             ),
           ),
-          Expanded(
-            child: switch (role) {
-              'STUDENT' => const StudentHomeScreen(),
-              'INSTRUCTOR' => const InstructorHomeScreen(),
-              _ => const AdminHomeScreen(),
-            },
-          ),
-        ],
-      ),
-    ),
-  );
+        );
 }
