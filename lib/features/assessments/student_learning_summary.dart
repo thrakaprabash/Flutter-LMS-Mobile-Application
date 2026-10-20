@@ -65,7 +65,12 @@ class _StudentLearningSummaryState extends State<StudentLearningSummary> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('My learning', style: Theme.of(context).textTheme.titleLarge),
-          if (busy) const LinearProgressIndicator(),
+          const SizedBox(height: 16),
+          if (busy) ...[
+            const Text('Loading your learning summary…'),
+            const SizedBox(height: 12),
+            const LinearProgressIndicator(),
+          ],
           if (error != null) ...[
             Text(error!),
             TextButton(
@@ -73,8 +78,27 @@ class _StudentLearningSummaryState extends State<StudentLearningSummary> {
               child: const Text('Retry learning summary'),
             ),
           ] else if (!busy) ...[
-            Text('$active in progress · ${completed.length} completed'),
-            const SizedBox(height: 12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: _LearningStat(
+                    value: active,
+                    label: 'In progress',
+                    icon: Icons.auto_stories_outlined,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _LearningStat(
+                    value: completed.length,
+                    label: 'Completed',
+                    icon: Icons.workspace_premium_outlined,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
             Text(
               'Completed courses',
               style: Theme.of(context).textTheme.titleMedium,
@@ -95,4 +119,40 @@ class _StudentLearningSummaryState extends State<StudentLearningSummary> {
       ),
     ),
   );
+}
+
+class _LearningStat extends StatelessWidget {
+  const _LearningStat({
+    required this.value,
+    required this.label,
+    required this.icon,
+  });
+  final int value;
+  final String label;
+  final IconData icon;
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.primaryContainer.withValues(alpha: .35),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: colors.primary, size: 24),
+          const SizedBox(height: 12),
+          Text(
+            '$value',
+            style: Theme.of(context).textTheme.headlineMedium
+                ?.copyWith(color: colors.primary),
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ),
+    );
+  }
 }

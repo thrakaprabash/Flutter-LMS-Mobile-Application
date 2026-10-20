@@ -59,3 +59,9 @@ Verification: static analysis passed; all seven Day 7 tests passed, including se
 Added a forest-green gradient course header with instructor, level/language badges and optional thumbnail, a separate learning-progress/enrollment card, responsive assessment/review shortcut cards, an overview/outcomes panel and rounded curriculum cards with folder icons. Missing metadata stays absent; official progress still comes from the backend. Navigation and enrollment/lesson services are unchanged.
 
 Verification: analysis passed. All five Day 6 tests, all seven Day 7 tests and both learning-widget tests passed across the targeted runs. The existing end-to-end learning test now scrolls back to the relocated progress card after lesson completion. Android build succeeded and the update installed and opened on emulator-5554. The fresh launch displayed onboarding; course details device inspection remains pending navigation into a course.
+
+## Profile UI refinement - 20 October 2026
+
+Added a matching forest-green identity header with photo controls, name, email and role badge. Learning totals now use separate icon cards with an explicit loading state. Personal details, learning/professional details and account/security controls are grouped into rounded cards; name inputs stack on narrow layouts. Existing profile/photo endpoints, validation, save recovery and logout confirmations are retained.
+
+Verification: analysis passed. Both profile-save tests and the isolated demo/session test passed. Tests wait for scrolling to settle and locate the Save action again after partial-save feedback expands the page. Android build succeeded and the updated app installed and opened on emulator-5554.

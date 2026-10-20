@@ -61,6 +61,7 @@ void main() {
       await tester.ensureVisible(goals);
       await tester.enterText(goals, 'New goal');
       await tester.ensureVisible(find.text('Save changes'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Save changes'));
       await tester.pumpAndSettle();
       expect(service.writes, [
@@ -74,6 +75,12 @@ void main() {
       );
       if (fail) {
         expect(tester.widget<TextField>(goals).controller!.text, 'New goal');
+        await tester.scrollUntilVisible(
+          find.text('Save changes'),
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.pumpAndSettle();
         await tester.tap(find.text('Save changes'));
         await tester.pumpAndSettle();
         expect(service.writes.where((p) => p == '/api/v1/users/me').length, 1);

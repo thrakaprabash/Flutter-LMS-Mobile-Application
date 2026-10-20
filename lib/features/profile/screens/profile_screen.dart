@@ -430,151 +430,309 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ]
         : <String>[];
     final imageUrl = auth.user?['profileImageUrl'];
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final name =
+        '${auth.user?['firstName'] ?? ''} ${auth.user?['lastName'] ?? ''}'
+            .trim();
+    final hasPhoto =
+        _demoPhoto != null || (imageUrl is String && imageUrl.isNotEmpty);
     return Form(
       key: _form,
       child: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
-          Text('My profile', style: Theme.of(context).textTheme.headlineMedium),
-          Text('${auth.user?['email'] ?? ''} · ${auth.role ?? ''}'),
-          const SizedBox(height: 20),
-          if (auth.role == 'STUDENT' &&
-              context.watch<LearningService?>() != null)
-            const StudentLearningSummary(),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Stack(
-                    children: [
-                      Container(
-                        width: 104,
-                        height: 104,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.outlineVariant,
-                            width: 3,
-                          ),
-                        ),
-                        child: ClipOval(
-                          child: _demoPhoto != null
-                              ? Image.memory(_demoPhoto!, fit: BoxFit.cover)
-                              : imageUrl is String && imageUrl.isNotEmpty
-                              ? Image.network(
-                                  imageUrl,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, e, stack) =>
-                                      _initials(auth),
-                                )
-                              : _initials(auth),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: IconButton.filled(
-                          tooltip: 'Change profile photo',
-                          onPressed: _busy ? null : () => image(false),
-                          icon: const Icon(Icons.camera_alt_outlined, size: 18),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Profile photo',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'JPG, PNG or WebP · Up to 5 MB',
-                    style: TextStyle(fontSize: 12),
-                  ),
-                  if (auth.isDemo)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 4),
-                      child: Text(
-                        'Demo preview only · Resets when you leave',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      OutlinedButton.icon(
-                        onPressed: _busy ? null : () => image(false),
-                        icon: const Icon(
-                          Icons.photo_library_outlined,
-                          size: 18,
-                        ),
-                        label: Text(
-                          _demoPhoto != null ||
-                                  (imageUrl is String && imageUrl.isNotEmpty)
-                              ? 'Change photo'
-                              : 'Choose photo',
-                        ),
-                      ),
-                      if (_demoPhoto != null ||
-                          (imageUrl is String && imageUrl.isNotEmpty))
-                        TextButton.icon(
-                          onPressed: _busy ? null : () => image(true),
-                          icon: const Icon(Icons.delete_outline, size: 18),
-                          label: const Text('Remove'),
-                        ),
-                    ],
-                  ),
-                  if (_busy)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12),
-                      child: LinearProgressIndicator(value: _progress),
-                    ),
-                ],
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF123E34), Color(0xFF22735F)],
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-          if (_message != null)
-            AuthFeedback(message: _message!, error: _messageIsError),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton.icon(
-              onPressed: _busy ? null : () => run(load),
-              icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Refresh details'),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
               children: [
-                Expanded(child: profileInput('firstName')),
-                const SizedBox(width: 12),
-                Expanded(child: profileInput('lastName')),
+                Text(
+                  'MY PROFILE',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: const Color(0xFFB5EAD5),
+                    letterSpacing: 2,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Stack(
+                  children: [
+                    Container(
+                      width: 104,
+                      height: 104,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                          width: 3,
+                        ),
+                      ),
+                      child: ClipOval(
+                        child: _demoPhoto != null
+                            ? Image.memory(_demoPhoto!, fit: BoxFit.cover)
+                            : imageUrl is String && imageUrl.isNotEmpty
+                            ? Image.network(
+                                imageUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, e, stack) => _initials(auth),
+                              )
+                            : _initials(auth),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: IconButton.filled(
+                        tooltip: 'Change profile photo',
+                        onPressed: _busy ? null : () => image(false),
+                        icon: const Icon(Icons.camera_alt_outlined, size: 18),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+                Text(
+                  name.isEmpty ? 'My profile' : name,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${auth.user?['email'] ?? ''}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Color(0xFFD2E7DD)),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: .12),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Text(
+                    auth.role == 'STUDENT'
+                        ? 'Student'
+                        : auth.role == 'INSTRUCTOR'
+                        ? 'Instructor'
+                        : 'Administrator',
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: BorderSide(
+                          color: Colors.white.withValues(alpha: .4),
+                        ),
+                      ),
+                      onPressed: _busy ? null : () => image(false),
+                      icon: const Icon(Icons.photo_library_outlined, size: 18),
+                      label: Text(hasPhoto ? 'Change photo' : 'Choose photo'),
+                    ),
+                    if (hasPhoto)
+                      TextButton.icon(
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFFD2E7DD),
+                        ),
+                        onPressed: _busy ? null : () => image(true),
+                        icon: const Icon(Icons.delete_outline, size: 18),
+                        label: const Text('Remove'),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'JPG, PNG or WebP · Up to 5 MB',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Color(0xFFB5D4C8), fontSize: 11),
+                ),
+                if (auth.isDemo)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Text(
+                      'Demo preview only · Resets when you leave',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Color(0xFFB5D4C8), fontSize: 11),
+                    ),
+                  ),
+                if (_busy)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: LinearProgressIndicator(value: _progress),
+                  ),
               ],
             ),
           ),
-          for (final key in ['bio', ...roleFields])
+          const SizedBox(height: 20),
+          if (auth.role == 'STUDENT' &&
+              context.watch<LearningService?>() != null) ...[
+            const StudentLearningSummary(),
+            const SizedBox(height: 20),
+          ],
+          if (_message != null)
             Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: profileInput(key),
+              padding: const EdgeInsets.only(bottom: 16),
+              child: AuthFeedback(message: _message!, error: _messageIsError),
             ),
+          _ProfileSection(
+            icon: Icons.person_outline_rounded,
+            title: 'Personal details',
+            subtitle: 'A little about you',
+            children: [
+              LayoutBuilder(
+                builder: (context, constraints) => constraints.maxWidth < 280
+                    ? Column(
+                        children: [
+                          profileInput('firstName'),
+                          const SizedBox(height: 16),
+                          profileInput('lastName'),
+                        ],
+                      )
+                    : Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: profileInput('firstName')),
+                          const SizedBox(width: 12),
+                          Expanded(child: profileInput('lastName')),
+                        ],
+                      ),
+              ),
+              const SizedBox(height: 16),
+              profileInput('bio'),
+            ],
+          ),
+          if (roleFields.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            _ProfileSection(
+              icon: auth.role == 'STUDENT'
+                  ? Icons.school_outlined
+                  : Icons.work_outline_rounded,
+              title: auth.role == 'STUDENT'
+                  ? 'Learning profile'
+                  : 'Professional details',
+              subtitle: auth.role == 'STUDENT'
+                  ? 'Your background and learning goals'
+                  : 'Share your experience and expertise',
+              children: [
+                for (var i = 0; i < roleFields.length; i++) ...[
+                  if (i > 0) const SizedBox(height: 16),
+                  profileInput(roleFields[i]),
+                ],
+              ],
+            ),
+          ],
           const SizedBox(height: 20),
           AuthSubmitButton(label: 'Save changes', busy: _busy, onPressed: save),
-          TextButton(
-            onPressed: _busy ? null : () => logout(false),
-            child: const Text('Log out'),
+          Align(
+            alignment: Alignment.center,
+            child: TextButton.icon(
+              onPressed: _busy ? null : () => run(load),
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: const Text('Refresh details'),
+            ),
           ),
-          TextButton(
-            onPressed: _busy ? null : () => logout(true),
-            child: const Text('Log out all devices'),
+          const SizedBox(height: 12),
+          _ProfileSection(
+            icon: Icons.shield_outlined,
+            title: 'Account & security',
+            subtitle: 'Manage your signed-in sessions',
+            children: [
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.logout_rounded, color: colors.error),
+                title: const Text('Log out'),
+                subtitle: const Text('Sign out on this device'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: _busy ? null : () => logout(false),
+              ),
+              const Divider(height: 24),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.devices_outlined, color: colors.error),
+                title: const Text('Log out all devices'),
+                subtitle: const Text('Sign out of every active session'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: _busy ? null : () => logout(true),
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ProfileSection extends StatelessWidget {
+  const _ProfileSection({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.children,
+  });
+  final IconData icon;
+  final String title, subtitle;
+  final List<Widget> children;
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: colors.primaryContainer.withValues(alpha: .5),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: colors.primary, size: 22),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            ...children,
+          ],
+        ),
       ),
     );
   }
