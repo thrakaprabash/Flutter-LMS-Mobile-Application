@@ -11,10 +11,17 @@ num? progressValue(dynamic value) {
 }
 
 String instructorName(Map<String, dynamic> course) {
-  final instructor = object(course['instructorId'] ?? course['instructor']);
-  final name =
-      '${instructor['firstName'] ?? ''} ${instructor['lastName'] ?? ''}'.trim();
-  return name.isEmpty ? 'Instructor information unavailable' : name;
+  for (final value in [course['instructorId'], course['instructor']]) {
+    final instructor = object(value);
+    final name =
+        '${instructor['firstName'] ?? ''} ${instructor['lastName'] ?? ''}'
+            .trim();
+    if (name.isNotEmpty) return name;
+    final display = '${instructor['fullName'] ?? instructor['name'] ?? ''}'
+        .trim();
+    if (display.isNotEmpty) return display;
+  }
+  return 'Instructor information unavailable';
 }
 
 String friendlyStatus(String status) => switch (status) {

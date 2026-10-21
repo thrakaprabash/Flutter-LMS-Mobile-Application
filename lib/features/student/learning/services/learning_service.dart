@@ -48,14 +48,45 @@ class LearningService {
     }
   }
 
-  Future<LearningPage> enrollments(int page, String status) async =>
-      LearningPage.decode(
-        await request(
-          'GET',
-          '/api/v1/enrollments/me?page=$page&limit=20&status=$status',
-        ),
-        'enrollments',
-      );
+  Future<LearningPage> enrollments(int page, String status) async {
+    final result = LearningPage.decode(
+      await request(
+        'GET',
+        '/api/v1/enrollments/me?page=$page&limit=20&status=$status',
+      ),
+      'enrollments',
+    );
+    final details = <String, Future<Map<String, dynamic>>>{};
+    final items = await Future.wait(
+      result.items.map((enrollment) async {
+        final raw = enrollment['courseId'] ?? enrollment['course'];
+        final course = object(raw);
+        final instructor = object(course['instructorId']);
+        final alternate = object(course['instructor']);
+        final hasName = [instructor, alternate].any(
+          (person) =>
+              '${person['firstName'] ?? ''} ${person['lastName'] ?? ''}'
+                  .trim()
+                  .isNotEmpty ||
+              '${person['fullName'] ?? person['name'] ?? ''}'.trim().isNotEmpty,
+        );
+        final id = raw is String ? raw : recordId(course);
+        if (hasName || id.isEmpty) return enrollment;
+        try {
+          final full = await details.putIfAbsent(id, () => detail(id));
+          return {
+            ...enrollment,
+            'courseId': {...course, ...full},
+          };
+        } catch (_) {
+          // A course detail failure must not hide the student's enrollments.
+          return enrollment;
+        }
+      }),
+    );
+    return LearningPage(items, result.hasNext);
+  }
+
   Future<Map<String, dynamic>> detail(String id) async {
     final data = object(
       (await request('GET', '/api/v1/courses/$id', public: true))['data'],

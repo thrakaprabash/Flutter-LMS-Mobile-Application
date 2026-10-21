@@ -17,6 +17,78 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   const storage = TokenStorage(FlutterSecureStorage());
   setUp(() => FlutterSecureStorage.setMockInitialValues({}));
+  test('enrollments resolve missing instructor names and preserve progress on detail failure', () async {
+    await storage.saveSession(
+      accessToken: 'test-access',
+      refreshToken: 'test-refresh',
+      role: 'STUDENT',
+    );
+    final client = ApiClient(storage);
+    final calls = <String>[];
+    client.dio.httpClientAdapter = FakeAdapter((request) {
+      calls.add(request.uri.path);
+      if (request.uri.path == '/api/v1/enrollments/me') {
+        return body(200, {
+          'data': {
+            'enrollments': [
+              {
+                'id': 'one',
+                'courseId': {'id': 'course', 'instructorId': 'teacher'},
+                'progressPercentage': 42,
+              },
+              {
+                'id': 'two',
+                'courseId': {'id': 'course'},
+                'progressPercentage': 10,
+              },
+              {
+                'id': 'three',
+                'courseId': {'id': 'unavailable'},
+                'progressPercentage': 15,
+              },
+              {
+                'id': 'four',
+                'courseId': {
+                  'id': 'complete',
+                  'instructorId': {'firstName': 'Alex'},
+                },
+              },
+            ],
+            'pagination': {'hasNextPage': true},
+          },
+        });
+      }
+      if (request.uri.path.endsWith('/unavailable')) {
+        return body(404, {'message': 'Unavailable'});
+      }
+      return body(200, {
+        'data': {
+          'course': {
+            'id': 'course',
+            'title': 'Flutter',
+            'instructorId': {'firstName': 'Alex', 'lastName': 'Taylor'},
+          },
+        },
+      });
+    });
+    final result = await LearningService(AccountService(client))
+        .enrollments(1, 'ACTIVE');
+    expect(
+      object(
+        object(result.items.first['courseId'])['instructorId'],
+      )['firstName'],
+      'Alex',
+    );
+    expect(result.items.first['progressPercentage'], 42);
+    expect(result.items[2]['progressPercentage'], 15);
+    expect(result.items, hasLength(4));
+    expect(result.hasNext, isTrue);
+    expect(
+      calls.where((path) => path == '/api/v1/courses/course'),
+      hasLength(1),
+    );
+    expect(calls, isNot(contains('/api/v1/courses/complete')));
+  });
   test('real transport follows endpoint methods, public access and nested pagination', () async {
     await storage.saveSession(
       accessToken: 'test-access',
