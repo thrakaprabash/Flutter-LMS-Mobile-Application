@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_lms/features/learning/learning_widgets.dart';
+import 'package:flutter_lms/features/student/learning/widgets/learning_widgets.dart';
 
 void main() {
   testWidgets('missing or invalid progress never shows a false zero', (

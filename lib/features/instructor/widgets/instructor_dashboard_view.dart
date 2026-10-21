@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'instructor_widgets.dart';
-import '../../learning/learning_service.dart';
+import '../../../shared/models/learning_page.dart';
 
 class InstructorDashboardView extends StatelessWidget {
   const InstructorDashboardView({

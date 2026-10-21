@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../learning/learning_service.dart';
-import '../../learning/learning_screens.dart' show learningError;
+import '../../../shared/models/learning_page.dart';
+import '../../../shared/utils/learning_error.dart' show learningError;
 import '../widgets/instructor_widgets.dart';
 
 typedef Record = Map<String, dynamic>;

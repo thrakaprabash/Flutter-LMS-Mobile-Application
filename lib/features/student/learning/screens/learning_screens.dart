@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
+
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../core/network/api_exception.dart';
-import '../../shared/providers/auth_provider.dart';
-import '../profile/screens/profile_screen.dart';
-import 'learning_service.dart';
-import 'learning_widgets.dart';
-import 'course_detail_widgets.dart';
-import 'lesson_video_player.dart';
-import 'demo_learning_service.dart';
-import '../assessments/activity_widgets.dart';
-import '../assessments/assignment_screen.dart';
-import '../assessments/quiz_screen.dart';
-import '../assessments/reviews_screen.dart';
-import '../assessments/notifications_screen.dart';
+import '../../../../shared/utils/learning_error.dart';
+export '../../../../shared/utils/learning_error.dart';
+import '../../../../shared/providers/auth_provider.dart';
+import '../../../profile/screens/profile_screen.dart';
+import '../services/learning_service.dart';
+import '../widgets/learning_widgets.dart';
+import '../../courses/widgets/course_detail_widgets.dart';
+import '../widgets/lesson_video_player.dart';
+import '../../../demo/demo_learning_service.dart';
+import '../../widgets/activity_widgets.dart';
+import '../../assignments/screens/assignment_screen.dart';
+import '../../quizzes/screens/quiz_screen.dart';
+import '../../reviews/screens/reviews_screen.dart';
+import '../../notifications/screens/notifications_screen.dart';
 
 Widget learningScope(BuildContext context, Widget child) =>
     ChangeNotifierProvider<AuthProvider>.value(
@@ -41,12 +42,6 @@ class _LearningAccess extends StatelessWidget {
     return child;
   }
 }
-
-String learningError(Object error) => error is DioException
-    ? ApiException.fromDio(error).message
-    : error is ApiException
-    ? error.message
-    : 'Unable to load learning content. Please try again.';
 
 class StudentLearningHome extends StatelessWidget {
   const StudentLearningHome({super.key});

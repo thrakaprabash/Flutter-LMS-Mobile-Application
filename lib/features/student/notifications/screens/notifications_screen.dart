@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../learning/learning_screens.dart';
-import '../learning/learning_service.dart';
-import 'activity_widgets.dart';
+import '../../learning/screens/learning_screens.dart';
+import '../../learning/services/learning_service.dart';
+import '../../widgets/activity_widgets.dart';
 
 class NotificationBell extends StatefulWidget {
   const NotificationBell({super.key});

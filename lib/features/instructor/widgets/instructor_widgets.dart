@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../learning/learning_service.dart';
+import '../../../shared/models/learning_page.dart';
 
 const studioInk = Color(0xFF173E32);
 const studioMuted = Color(0xFF718078);

@@ -10,7 +10,7 @@ import 'package:flutter_lms/features/auth/services/account_service.dart';
 import 'package:flutter_lms/features/demo/demo_screen.dart';
 import 'package:flutter_lms/features/instructor/screens/instructor_home_screen.dart';
 import 'package:flutter_lms/features/instructor/services/instructor_service.dart';
-import 'package:flutter_lms/features/learning/learning_service.dart';
+import 'package:flutter_lms/features/student/learning/services/learning_service.dart';
 import 'package:flutter_lms/shared/providers/auth_provider.dart';
 
 import 'core_api_test.dart' show FakeAdapter;

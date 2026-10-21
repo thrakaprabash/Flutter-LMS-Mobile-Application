@@ -1,4 +1,4 @@
-import 'learning_service.dart';
+import '../student/learning/services/learning_service.dart';
 
 /// Local sample state exists only inside the debug demo's provider scope.
 class DemoLearningService extends LearningService {

@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 
 import '../../core/network/api_exception.dart';
 import '../instructor/services/instructor_service.dart';
-import '../learning/learning_service.dart';
+import '../student/learning/services/learning_service.dart';
 
 /// Disposable instructor fixtures. This class has no network client or storage.
 class DemoInstructorData {

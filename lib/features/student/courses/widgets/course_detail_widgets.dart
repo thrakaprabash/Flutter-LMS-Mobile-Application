@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'learning_widgets.dart';
+import '../../learning/widgets/learning_widgets.dart';
 
 class CourseHero extends StatelessWidget {
   const CourseHero({super.key, required this.course});

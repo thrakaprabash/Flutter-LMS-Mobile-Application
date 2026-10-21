@@ -9,9 +9,9 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../shared/providers/auth_provider.dart';
-import '../../assessments/activity_widgets.dart';
-import '../../learning/learning_service.dart';
-import '../../learning/learning_screens.dart' show learningError;
+import '../../../shared/widgets/confirmation_dialog.dart';
+import '../../../shared/models/learning_page.dart';
+import '../../../shared/utils/learning_error.dart' show learningError;
 import '../../profile/screens/profile_screen.dart';
 import '../services/instructor_service.dart';
 import 'instructor_editor.dart';
@@ -378,9 +378,7 @@ class _InstructorWorkspaceState extends State<InstructorWorkspace> {
       error = null;
     });
     try {
-      final categories = await LearningService(
-        context.read<AuthProvider>().service,
-      ).categories();
+      final categories = await service.categories();
       if (!mounted) return;
       if (categories.isEmpty) {
         setState(

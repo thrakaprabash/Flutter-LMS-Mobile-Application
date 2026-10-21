@@ -5,9 +5,9 @@ import 'package:flutter_lms/core/network/api_client.dart';
 import 'package:flutter_lms/core/storage/token_storage.dart';
 import 'package:flutter_lms/features/auth/services/account_service.dart';
 import 'package:flutter_lms/features/demo/demo_screen.dart';
-import 'package:flutter_lms/features/learning/demo_learning_service.dart';
-import 'package:flutter_lms/features/learning/learning_service.dart';
-import 'package:flutter_lms/features/learning/learning_screens.dart';
+import 'package:flutter_lms/features/demo/demo_learning_service.dart';
+import 'package:flutter_lms/features/student/learning/services/learning_service.dart';
+import 'package:flutter_lms/features/student/learning/screens/learning_screens.dart';
 import 'package:flutter_lms/shared/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 

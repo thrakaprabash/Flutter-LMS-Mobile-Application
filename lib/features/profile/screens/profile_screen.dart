@@ -11,8 +11,8 @@ import 'package:mime/mime.dart';
 
 import '../../../shared/providers/auth_provider.dart';
 import '../../../core/network/api_exception.dart';
-import '../../assessments/student_learning_summary.dart';
-import '../../learning/learning_service.dart';
+import '../../student/learning/widgets/student_learning_summary.dart';
+import '../../student/learning/services/learning_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key, this.onSignedOut});

@@ -1,12 +1,30 @@
 import 'package:dio/dio.dart';
 
 import '../../auth/services/account_service.dart';
-import '../../learning/learning_service.dart';
+import '../../../shared/models/learning_page.dart';
 
 /// Instructor operations always use the authenticated transport and backend ownership checks.
 class InstructorService {
   InstructorService(this.account);
   final AccountService account;
+
+  Future<List<Map<String, dynamic>>> categories() async {
+    final categories = <Map<String, dynamic>>[];
+    var page = 1;
+    while (true) {
+      final batch = LearningPage.decode(
+        await account.request(
+          'GET',
+          '/api/v1/categories?page=$page&limit=20',
+          public: true,
+        ),
+        'categories',
+      );
+      categories.addAll(batch.items.where((item) => item['isActive'] != false));
+      if (!batch.hasNext) return categories;
+      page++;
+    }
+  }
 
   Future<Map<String, dynamic>> get(String path, String key) async {
     final data = object((await account.request('GET', path))['data']);

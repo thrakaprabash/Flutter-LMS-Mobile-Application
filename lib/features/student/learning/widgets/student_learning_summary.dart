@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../learning/learning_service.dart';
-import '../learning/learning_screens.dart';
+import '../services/learning_service.dart';
+import '../screens/learning_screens.dart';
 
 class StudentLearningSummary extends StatefulWidget {
   const StudentLearningSummary({super.key});

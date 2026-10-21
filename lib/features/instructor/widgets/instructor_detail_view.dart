@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../learning/learning_service.dart';
+import '../../../shared/models/learning_page.dart';
 import 'instructor_widgets.dart';
 
 class InstructorDetailView extends StatelessWidget {

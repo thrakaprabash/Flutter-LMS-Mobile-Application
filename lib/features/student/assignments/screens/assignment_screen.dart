@@ -5,9 +5,9 @@ import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../learning/learning_service.dart';
-import '../learning/learning_screens.dart';
-import 'activity_widgets.dart';
+import '../../learning/services/learning_service.dart';
+import '../../learning/screens/learning_screens.dart';
+import '../../widgets/activity_widgets.dart';
 
 class AssignmentScreen extends StatefulWidget {
   const AssignmentScreen({super.key, required this.id});

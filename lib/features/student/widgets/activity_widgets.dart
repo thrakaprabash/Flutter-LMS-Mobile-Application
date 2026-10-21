@@ -1,38 +1,16 @@
+export '../../../shared/widgets/confirmation_dialog.dart';
+
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 
-import '../../shared/providers/auth_provider.dart';
-import '../learning/learning_screens.dart';
-import '../learning/learning_service.dart';
-import 'student_activity_service.dart';
+import '../../../shared/providers/auth_provider.dart';
+import '../learning/screens/learning_screens.dart';
+import '../learning/services/learning_service.dart';
+import '../services/student_activity_service.dart';
 
 StudentActivityService activityService(BuildContext context) =>
     StudentActivityService(context.read<AuthProvider>().service);
-
-Future<bool> confirmActivity(
-  BuildContext context,
-  String title,
-  String message,
-) async =>
-    await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Confirm'),
-          ),
-        ],
-      ),
-    ) ==
-    true;
 
 class ActivityStatus extends StatelessWidget {
   const ActivityStatus(this.status, {super.key});

@@ -289,6 +289,17 @@ lib/
     student/dashboard/
       models/                       Student sample dashboard data
       screens/                      StudentHomeScreen
+    student/courses/widgets/        Course detail widgets
+    student/learning/
+      services/                     Student catalogue, enrollment and lesson API
+      screens/                      Student learning and course flows
+      widgets/                      Lesson player, progress and learning summary
+    student/assignments/screens/    Student assignment submissions
+    student/quizzes/screens/        Student quiz attempts
+    student/reviews/screens/        Student course reviews
+    student/notifications/screens/  Student notification inbox
+    student/services/              Student activity API operations
+    student/widgets/               Shared student activity widgets
     instructor/
       screens/                      Instructor home, workspace and editors
       services/                     Authenticated instructor API operations

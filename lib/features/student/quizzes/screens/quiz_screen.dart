@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../learning/learning_service.dart';
-import '../learning/learning_screens.dart';
-import 'activity_widgets.dart';
+import '../../learning/services/learning_service.dart';
+import '../../learning/screens/learning_screens.dart';
+import '../../widgets/activity_widgets.dart';
 
 class QuizScreen extends StatefulWidget {
   const QuizScreen({super.key, required this.id});

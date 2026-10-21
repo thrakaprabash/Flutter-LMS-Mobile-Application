@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:video_player/video_player.dart';
-import 'package:flutter_lms/features/learning/lesson_video_player.dart';
+import 'package:flutter_lms/features/student/learning/widgets/lesson_video_player.dart';
 
 class TestVideoController extends VideoPlayerController {
   TestVideoController()

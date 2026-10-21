@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../shared/providers/auth_provider.dart';
-import '../learning/learning_screens.dart';
-import '../learning/learning_service.dart';
-import 'activity_widgets.dart';
+import '../../../../shared/providers/auth_provider.dart';
+import '../../learning/screens/learning_screens.dart';
+import '../../learning/services/learning_service.dart';
+import '../../widgets/activity_widgets.dart';
 
 class ReviewsScreen extends StatefulWidget {
   const ReviewsScreen({

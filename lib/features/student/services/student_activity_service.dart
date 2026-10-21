@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
-import '../auth/services/account_service.dart';
-import '../learning/learning_service.dart';
+import '../../auth/services/account_service.dart';
+import '../learning/services/learning_service.dart';
 
 class StudentActivityService {
   StudentActivityService(this.account);
