@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+
+import '../../widgets/student_ui.dart';
+
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -140,11 +143,45 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
           ),
         ],
         if (message != null) Text(message!),
-        Text(
-          '${assignment['description'] ?? assignment['instructions'] ?? ''}',
+        StudentHeading(
+          'Put your skills into practice',
+          subtitle: '${assignment['description'] ?? ''}',
         ),
-        Text(
-          'Due: ${assignment['dueDate'] ?? '—'} · Maximum marks: ${assignment['maxMarks'] ?? '—'}',
+        StudentPanel(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(
+                Icons.assignment_outlined,
+                color: studentInk,
+                size: 28,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Due: ${assignment['dueDate'] == null ? '—' : DateTime.tryParse('${assignment['dueDate']}')?.toLocal().toString().replaceFirst(RegExp(r':\d{2}\.\d+$'), '') ?? assignment['dueDate']}',
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Maximum marks: ${assignment['maximumMarks'] ?? assignment['maxMarks'] ?? '—'}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: studentInk,
+                ),
+              ),
+              if ('${assignment['instructions'] ?? ''}'.trim().isNotEmpty) ...[
+                const Divider(height: 28),
+                const Text(
+                  'Your brief',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: studentInk,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text('${assignment['instructions']}'),
+              ],
+            ],
+          ),
         ),
         if (assignment['attachmentUrl'] is String)
           TextButton(
@@ -170,6 +207,11 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
         if (graded)
           const Text('This submission has been graded. Editing is closed.'),
         const SizedBox(height: 16),
+        const StudentHeading(
+          'Your submission',
+          subtitle:
+              'Check the brief, add your work, and submit when you are ready.',
+        ),
         TextField(
           controller: text,
           enabled: loaded && !graded && !busy,
@@ -190,6 +232,7 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
           icon: const Icon(Icons.attach_file),
           label: const Text('Choose file'),
         ),
+        const SizedBox(height: 12),
         FilledButton(
           onPressed: !loaded || graded || busy ? null : send,
           child: Text(

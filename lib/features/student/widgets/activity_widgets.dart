@@ -8,6 +8,7 @@ import '../../../shared/providers/auth_provider.dart';
 import '../learning/screens/learning_screens.dart';
 import '../learning/services/learning_service.dart';
 import '../services/student_activity_service.dart';
+import 'student_ui.dart';
 
 StudentActivityService activityService(BuildContext context) =>
     StudentActivityService(context.read<AuthProvider>().service);
@@ -110,16 +111,39 @@ class _ActivityListState extends State<ActivityList> {
     body: ListView(
       padding: const EdgeInsets.all(20),
       children: [
+        StudentHeading(
+          widget.listKey == 'quizzes'
+              ? 'Check your understanding'
+              : 'Learn by doing',
+          subtitle: widget.listKey == 'quizzes'
+              ? 'Put your knowledge to the test and review your results.'
+              : 'Turn what you have learned into work you can be proud of.',
+        ),
         if (busy) const LinearProgressIndicator(),
         if (error != null) ...[
           Text(error!),
           TextButton(onPressed: () => load(), child: const Text('Retry')),
         ],
         if (!busy && error == null && items.isEmpty)
-          const Text('Nothing here yet.'),
+          const StudentEmpty(
+            title: 'Nothing here yet.',
+            message: 'Your instructor will share activities here when they are ready.',
+            icon: Icons.assignment_outlined,
+          ),
         for (final item in items)
           Card(
+            margin: const EdgeInsets.only(bottom: 14),
             child: ListTile(
+              contentPadding: const EdgeInsets.all(18),
+              leading: CircleAvatar(
+                backgroundColor: const Color(0xFFE8EFDF),
+                child: Icon(
+                  widget.listKey == 'quizzes'
+                      ? Icons.quiz_outlined
+                      : Icons.assignment_outlined,
+                  color: studentInk,
+                ),
+              ),
               title: Text(
                 '${item['title'] ?? item['questionText'] ?? 'Assessment'}',
               ),

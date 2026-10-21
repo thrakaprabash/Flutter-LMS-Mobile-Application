@@ -142,7 +142,12 @@ void main() {
       find.byType(TextField),
       'Corrected layout explanation',
     );
-    await tester.ensureVisible(find.text('Submit correction'));
+    await tester.scrollUntilVisible(
+      find.text('Submit correction'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Submit correction'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Confirm'));
@@ -151,6 +156,11 @@ void main() {
       service.activity.submissions['demo-assignment']?['status'],
       'SUBMITTED',
     );
+    await tester.scrollUntilVisible(
+      find.text('Assignment submitted.'),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('Assignment submitted.'), findsOneWidget);
   });
   testWidgets('graded submission disables every edit action', (tester) async {
@@ -158,7 +168,23 @@ void main() {
       screen(demo(), const AssignmentScreen(id: 'demo-graded')),
     );
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Marks: 85'),
+      150,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Marks: 85'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.byType(TextField),
+      150,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(tester.widget<TextField>(find.byType(TextField)).enabled, false);
+    await tester.scrollUntilVisible(
+      find.text('Submit assignment'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(
       tester
           .widget<FilledButton>(
@@ -167,7 +193,6 @@ void main() {
           .onPressed,
       isNull,
     );
-    expect(find.text('Marks: 85'), findsOneWidget);
   });
   testWidgets('quiz starts, selects an option and displays returned result', (
     tester,

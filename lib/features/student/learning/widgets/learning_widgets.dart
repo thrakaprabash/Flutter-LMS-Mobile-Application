@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/learning_service.dart';
+import '../../widgets/student_ui.dart';
 
 num? progressValue(dynamic value) {
   final parsed = num.tryParse('$value');
@@ -78,9 +79,15 @@ class CourseCard extends StatelessWidget {
     final status = enrollment?['status']?.toString();
     final active = status == 'ACTIVE' || status == 'COMPLETED';
     final placeholder = Container(
-      color: colors.primaryContainer,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFFDCE9DE), Color(0xFFBBD3C0)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
       alignment: Alignment.center,
-      child: Icon(Icons.menu_book_outlined, size: 40, color: colors.primary),
+      child: Icon(Icons.auto_stories_outlined, size: 48, color: colors.primary),
     );
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -90,14 +97,41 @@ class CourseCard extends StatelessWidget {
         children: [
           ExcludeSemantics(
             child: SizedBox(
-              height: 132,
-              child: thumbnail == null || thumbnail.isEmpty
-                  ? placeholder
-                  : Image.network(
-                      thumbnail,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => placeholder,
+              height: 160,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  thumbnail == null || thumbnail.isEmpty
+                      ? placeholder
+                      : Image.network(
+                          thumbnail,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => placeholder,
+                        ),
+                  Positioned(
+                    left: 14,
+                    top: 14,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 7,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: .95),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        status != null ? friendlyStatus(status) : 'Discover',
+                        style: const TextStyle(
+                          color: studentInk,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
+                  ),
+                ],
+              ),
             ),
           ),
           Padding(
@@ -107,24 +141,65 @@ class CourseCard extends StatelessWidget {
               children: [
                 Text(
                   '${course['title'] ?? 'Course unavailable'}',
-                  style: Theme.of(context).textTheme.titleLarge,
+                  style: const TextStyle(
+                    fontSize: 21,
+                    height: 1.3,
+                    fontWeight: FontWeight.w700,
+                    color: studentInk,
+                  ),
                 ),
                 const SizedBox(height: 8),
-                Text(instructorName(course)),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.person_outline_rounded,
+                      size: 16,
+                      color: studentMuted,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        instructorName(course),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: studentMuted,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
                   runSpacing: 6,
                   children: [
                     if (course['level'] != null)
-                      Chip(label: Text('${course['level']}')),
-                    if (status != null)
-                      Chip(label: Text(friendlyStatus(status))),
+                      Chip(
+                        label: Text(
+                          '${course['level']}'
+                              .replaceAll('_', ' ')
+                              .toLowerCase(),
+                        ),
+                        visualDensity: VisualDensity.compact,
+                        side: BorderSide.none,
+                        backgroundColor: const Color(0xFFEFF3E9),
+                      ),
+                    if (course['language'] != null)
+                      Chip(
+                        label: Text('${course['language']}'),
+                        visualDensity: VisualDensity.compact,
+                        side: BorderSide.none,
+                        backgroundColor: const Color(0xFFEFF3E9),
+                      ),
                   ],
                 ),
                 if (course['shortDescription'] != null) ...[
                   const SizedBox(height: 8),
-                  Text('${course['shortDescription']}'),
+                  Text(
+                    '${course['shortDescription']}',
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
                 if (enrollment != null) ...[
                   const SizedBox(height: 16),
@@ -135,9 +210,18 @@ class CourseCard extends StatelessWidget {
                 ],
                 const SizedBox(height: 16),
                 FilledButton.tonalIcon(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: active
+                        ? studentInk
+                        : const Color(0xFFE5EEDC),
+                    foregroundColor: active ? Colors.white : studentInk,
+                  ),
                   onPressed: onOpen,
                   icon: Icon(active ? Icons.play_arrow : Icons.arrow_forward),
-                  label: Text(active ? 'Continue learning' : 'View course'),
+                  label: Text(
+                    active ? 'Continue learning' : 'View course',
+                    style: const TextStyle(fontFamily: 'LmsRoboto'),
+                  ),
                 ),
               ],
             ),

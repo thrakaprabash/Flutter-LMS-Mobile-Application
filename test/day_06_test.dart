@@ -137,6 +137,8 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    await tester.tap(find.text('Explore'));
+    await tester.pumpAndSettle();
     expect(find.text('Find your next course'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -153,6 +155,8 @@ void main() {
           child: const MaterialApp(home: StudentLearningHome()),
         ),
       );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Explore'));
       await tester.pumpAndSettle();
       await tester.scrollUntilVisible(
         find.text('View course'),

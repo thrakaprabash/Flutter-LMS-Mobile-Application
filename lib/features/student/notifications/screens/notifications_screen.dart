@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../widgets/student_ui.dart';
+
 import '../../learning/screens/learning_screens.dart';
 import '../../learning/services/learning_service.dart';
 import '../../widgets/activity_widgets.dart';
@@ -133,6 +135,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     body: ListView(
       padding: const EdgeInsets.all(20),
       children: [
+        const StudentHeading(
+          'Stay in the loop',
+          subtitle:
+              'Course updates, feedback and your latest learning activity.',
+        ),
         if (busy) const LinearProgressIndicator(),
         Text(count == null ? 'Unread count unavailable' : '$count unread'),
         SwitchListTile(
@@ -159,9 +166,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         ],
         if (!busy && error == null && items.isEmpty)
-          const Text('You’re all caught up.'),
+          const StudentEmpty(
+            title: 'You’re all caught up.',
+            message: 'New updates will appear here.',
+            icon: Icons.notifications_none_rounded,
+          ),
         for (final n in items)
           Card(
+            margin: const EdgeInsets.only(bottom: 12),
             child: ListTile(
               leading: Icon(
                 n['isRead'] == true

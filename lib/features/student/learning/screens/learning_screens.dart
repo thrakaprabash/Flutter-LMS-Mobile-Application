@@ -18,6 +18,7 @@ import '../../assignments/screens/assignment_screen.dart';
 import '../../quizzes/screens/quiz_screen.dart';
 import '../../reviews/screens/reviews_screen.dart';
 import '../../notifications/screens/notifications_screen.dart';
+import '../../widgets/student_ui.dart';
 
 Widget learningScope(BuildContext context, Widget child) =>
     ChangeNotifierProvider<AuthProvider>.value(
@@ -69,19 +70,75 @@ class _LearningHomeState extends State<_LearningHome> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: Text(['Browse courses', 'My courses', 'Profile'][tab]),
-      actions: const [NotificationBell()],
+      title: Text(
+        ['Learning space', 'Explore courses', 'My learning', 'My profile'][tab],
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          color: studentInk,
+        ),
+      ),
+      backgroundColor: const Color(0xFFF6F7F2),
+      surfaceTintColor: Colors.transparent,
+      actions: [
+        const NotificationBell(),
+        if (tab != 3)
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: IconButton(
+              tooltip: 'My profile',
+              onPressed: () => setState(() => tab = 3),
+              icon: Builder(
+                builder: (context) {
+                  final user = context.watch<AuthProvider>().user;
+                  final name = '${user?['firstName'] ?? ''}'.trim();
+                  final url = user?['profileImageUrl'];
+                  final fallback = CircleAvatar(
+                    radius: 18,
+                    backgroundColor: const Color(0xFFE3EBD9),
+                    child: Text(
+                      name.isEmpty ? 'S' : name.substring(0, 1).toUpperCase(),
+                      style: const TextStyle(fontSize: 13, color: studentInk),
+                    ),
+                  );
+                  return SizedBox.square(
+                    dimension: 36,
+                    child: ClipOval(
+                      child: url is String && url.isNotEmpty
+                          ? Image.network(
+                              url,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, error, stack) => fallback,
+                            )
+                          : fallback,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+      ],
     ),
     bottomNavigationBar: NavigationBar(
+      backgroundColor: Colors.white,
+      indicatorColor: const Color(0xFFE5EEDC),
+      height: 76,
       selectedIndex: tab,
       onDestinationSelected: (i) => setState(() => tab = i),
       destinations: const [
         NavigationDestination(
+          icon: Icon(Icons.space_dashboard_outlined),
+          selectedIcon: Icon(Icons.space_dashboard_rounded),
+          label: 'Home',
+        ),
+        NavigationDestination(
           icon: Icon(Icons.explore_outlined),
-          label: 'Browse courses',
+          selectedIcon: Icon(Icons.explore_rounded),
+          label: 'Explore',
         ),
         NavigationDestination(
           icon: Icon(Icons.menu_book_outlined),
+          selectedIcon: Icon(Icons.menu_book_rounded),
           label: 'My courses',
         ),
         NavigationDestination(
@@ -90,15 +147,35 @@ class _LearningHomeState extends State<_LearningHome> {
         ),
       ],
     ),
-    body: tab == 2
-        ? const ProfileScreen()
-        : CourseList(key: ValueKey(tab), mine: tab == 1),
+    body: tab == 3
+        ? ProfileScreen(
+            onSignedOut: () {
+              if (context.read<AuthProvider>().isDemo) {
+                Navigator.pop(context);
+              } else {
+                Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
+              }
+            },
+          )
+        : CourseList(
+            key: ValueKey(tab),
+            mine: tab != 1,
+            dashboard: tab == 0,
+            onExplore: () => setState(() => tab = 1),
+          ),
   );
 }
 
 class CourseList extends StatefulWidget {
-  const CourseList({super.key, required this.mine});
+  const CourseList({
+    super.key,
+    required this.mine,
+    this.dashboard = false,
+    this.onExplore,
+  });
   final bool mine;
+  final bool dashboard;
+  final VoidCallback? onExplore;
   @override
   State<CourseList> createState() => _CourseListState();
 }
@@ -189,31 +266,56 @@ class _CourseListState extends State<CourseList> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                widget.mine ? 'My courses' : 'Find your next course',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 16),
-              if (widget.mine)
-                DropdownButtonFormField<String>(
-                  isExpanded: true,
-                  initialValue: status,
-                  items: [
-                    for (final s in ['ACTIVE', 'COMPLETED', 'CANCELLED'])
-                      DropdownMenuItem(value: s, child: Text(s)),
-                  ],
-                  onChanged: busy
-                      ? null
-                      : (s) {
-                          status = s!;
-                          load();
-                        },
-                )
-              else ...[
+              if (widget.dashboard) ...[
+                Text(
+                  'Good to see you${'${context.watch<AuthProvider>().user?['firstName'] ?? ''}'.trim().isEmpty ? '' : ', ${context.watch<AuthProvider>().user?['firstName']}'}',
+                  style: const TextStyle(color: studentMuted),
+                ),
+                const SizedBox(height: 8),
+                const StudentHeading('A little learning, every day.'),
+                StudentHero(onExplore: widget.onExplore!),
+                const StudentHeading(
+                  'Pick up where you left off',
+                  subtitle: 'Your active courses, ready when you are.',
+                ),
+              ] else
+                StudentHeading(
+                  widget.mine
+                      ? 'Your learning journey'
+                      : 'Find your next course',
+                  subtitle: widget.mine
+                      ? 'Keep moving forward, one lesson at a time.'
+                      : 'Explore ideas. Build skills. Find what inspires you.',
+                ),
+              if (widget.mine && !widget.dashboard)
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (final s in ['ACTIVE', 'COMPLETED', 'CANCELLED'])
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ChoiceChip(
+                            label: Text(friendlyStatus(s)),
+                            selected: status == s,
+                            onSelected: busy
+                                ? null
+                                : (_) {
+                                    status = s;
+                                    load();
+                                  },
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              if (!widget.mine) ...[
                 TextField(
                   controller: search,
+                  textInputAction: TextInputAction.search,
                   decoration: InputDecoration(
                     labelText: 'Search courses',
+                    prefixIcon: const Icon(Icons.search_rounded),
                     suffixIcon: IconButton(
                       onPressed: busy ? null : () => load(),
                       icon: const Icon(Icons.search),
@@ -221,7 +323,12 @@ class _CourseListState extends State<CourseList> {
                   ),
                   onSubmitted: (_) => load(),
                 ),
+                const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(
+                    labelText: 'Category',
+                    prefixIcon: Icon(Icons.category_outlined),
+                  ),
                   isExpanded: true,
                   key: ValueKey(category),
                   initialValue: category,
@@ -274,9 +381,13 @@ class _CourseListState extends State<CourseList> {
                 ),
               ],
               if (!busy && error == null && items.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(32),
-                  child: Text('No courses found.'),
+                StudentEmpty(
+                  title: widget.mine
+                      ? 'Your next chapter starts here'
+                      : 'No courses found.',
+                  message: widget.mine
+                      ? 'Enroll in a course to start learning. Your courses will appear here.'
+                      : 'Try another search or choose a different category.',
                 ),
               if (hasNext && !busy)
                 OutlinedButton(
@@ -998,12 +1109,25 @@ class _LessonScreenState extends State<LessonScreen> {
                 'Demo media  -  Public sample  -  Internet connection required',
               ),
             Text(
-              '${l['lessonType']}',
+              '${l['lessonType']} LESSON',
               style: Theme.of(context).textTheme.labelLarge,
             ),
             const SizedBox(height: 16),
+            StudentHeading(
+              '${l['title'] ?? 'Your lesson'}',
+              subtitle: '${l['description'] ?? ''}',
+            ),
             if (l['lessonType'] == 'TEXT')
-              SelectableText('${l['textContent'] ?? 'No text available.'}'),
+              StudentPanel(
+                child: SelectableText(
+                  '${l['textContent'] ?? 'No text available.'}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    height: 1.8,
+                    color: Color(0xFF304B40),
+                  ),
+                ),
+              ),
             if (l['lessonType'] == 'VIDEO' &&
                 video?.value.isInitialized == true) ...[
               LessonVideoPlayer(

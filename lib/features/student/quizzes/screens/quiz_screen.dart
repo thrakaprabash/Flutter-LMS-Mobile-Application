@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../widgets/student_ui.dart';
+
 import '../../learning/services/learning_service.dart';
 import '../../learning/screens/learning_screens.dart';
 import '../../widgets/activity_widgets.dart';
@@ -136,16 +138,33 @@ class _QuizScreenState extends State<QuizScreen> {
               child: const Text('Refresh quiz'),
             ),
           ],
-          Text('${quiz['description'] ?? ''}'),
-          Text(
-            'Time limit: ${quiz['timeLimitMinutes'] ?? '—'} minutes · Maximum attempts: ${quiz['maxAttempts'] ?? '—'}',
+          StudentHeading(
+            active ? 'Show what you know' : 'Ready to test your knowledge?',
+            subtitle: '${quiz['description'] ?? ''}',
           ),
-          Text('Passing score: ${quiz['passingScore'] ?? '—'}'),
+          StudentPanel(
+            child: Wrap(
+              spacing: 24,
+              runSpacing: 16,
+              children: [
+                Text('Time limit: ${quiz['timeLimitMinutes'] ?? '—'} minutes'),
+                Text('Maximum attempts: ${quiz['maxAttempts'] ?? '—'}'),
+                Text(
+                  'Passing score: ${quiz['passingScore'] ?? '—'}%',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: studentInk,
+                  ),
+                ),
+              ],
+            ),
+          ),
           if (attempt['expiresAt'] != null)
             Text('Attempt deadline: ${attempt['expiresAt']}'),
           if (active) ...[
             for (final q in questions)
               Card(
+                margin: const EdgeInsets.only(bottom: 16),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
