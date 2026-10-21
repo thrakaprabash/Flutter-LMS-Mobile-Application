@@ -1,3 +1,5 @@
+> Historical milestone record: all application demo modes and sample dashboards were removed on 21 October 2026. See [current backend-only status](backend_only.md).
+
 # Day 5: Authentication, sessions, password recovery and profiles
 
 Implemented against the supplied task plan (Day 5), updated LMS Mobile API Integration Guide (sections 8, 10, 12.1-12.7), Backend API Report and corresponding Postman folders. Reviewed the supplied commit standard; commits and pushes remain manual.

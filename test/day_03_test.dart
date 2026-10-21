@@ -51,32 +51,6 @@ void main() {
     );
   });
 
-  // Instructor preview was replaced with the authenticated studio in Day 8.
-  for (final route in ['/admin']) {
-    testWidgets('$route navigation fits small screen with large text', (
-      tester,
-    ) async {
-      tester.view.physicalSize = const Size(320, 568);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      tester.platformDispatcher.textScaleFactorTestValue = 1.5;
-      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-      await tester.pumpWidget(testApp(initialRoute: route));
-      await tester.pumpAndSettle();
-      expect(find.text('Preview dashboard · Sample data'), findsOneWidget);
-      final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
-      bar.onDestinationSelected!(1);
-      await tester.pumpAndSettle();
-      expect(find.text('Back to overview'), findsOneWidget);
-      await tester.tap(find.text('Back to overview'));
-      await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(find.text('Recent activity'), 250);
-      expect(find.text('Recent activity'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
-  }
-
   testWidgets('shared states render and retry invokes caller', (tester) async {
     var retried = false;
     for (final status in UiStatus.values) {

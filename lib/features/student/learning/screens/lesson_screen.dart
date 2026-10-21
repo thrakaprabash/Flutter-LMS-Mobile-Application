@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../shared/providers/auth_provider.dart';
 import '../../../../shared/utils/learning_error.dart';
 import '../services/learning_service.dart';
 import '../learning_scope.dart';
@@ -130,7 +129,7 @@ class _LessonScreenState extends State<LessonScreen> {
   @override
   Widget build(BuildContext context) {
     final l = lesson;
-    final demo = context.watch<AuthProvider>().isDemo;
+
     return Scaffold(
       appBar: AppBar(title: Text('${l?['title'] ?? 'Lesson'}')),
       body: ListView(
@@ -145,10 +144,6 @@ class _LessonScreenState extends State<LessonScreen> {
             ),
           ],
           if (l != null) ...[
-            if (demo && l['lessonType'] != 'TEXT')
-              const Text(
-                'Demo media  -  Public sample  -  Internet connection required',
-              ),
             Text(
               '${l['lessonType']} LESSON',
               style: Theme.of(context).textTheme.labelLarge,
@@ -193,11 +188,7 @@ class _LessonScreenState extends State<LessonScreen> {
               ),
             ],
             if (l['lessonType'] != 'TEXT' && mediaUrl(l) == null)
-              Text(
-                demo
-                    ? 'Demo media lesson. Sign in to access uploaded course videos and documents.'
-                    : 'The lesson media is unavailable.',
-              ),
+              Text('The lesson media is unavailable.'),
             if (l['lessonType'] == 'DOCUMENT' && mediaUrl(l) != null)
               FilledButton.icon(
                 onPressed: () => openDocument(mediaUrl(l)!),

@@ -1,3 +1,5 @@
+> Historical milestone record: all application demo modes and sample dashboards were removed on 21 October 2026. See [current backend-only status](backend_only.md).
+
 # Day 7 - Student assessments, communication and profile
 
 Implemented on 19 October 2026 using the supplied Day 7 plan, Mobile API Integration Guide, Backend API Report and Postman collection.

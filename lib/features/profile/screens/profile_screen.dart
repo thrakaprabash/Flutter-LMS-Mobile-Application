@@ -27,7 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _busy = true;
   String? _message;
   double? _progress;
-  Uint8List? _demoPhoto;
+
   bool _messageIsError = false;
   TextEditingController field(String key) =>
       _fields.putIfAbsent(key, TextEditingController.new);
@@ -186,11 +186,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return;
       }
       if (mounted) {
-        setState(
-          () => _message = auth.isDemo
-              ? 'Demo changes saved locally.'
-              : 'All changes saved.',
-        );
+        setState(() => _message = 'All changes saved.');
       }
     });
   }
@@ -216,14 +212,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
       if (confirmed != true || !mounted) return;
-      if (auth.isDemo) {
-        setState(() {
-          _demoPhoto = null;
-          _message = 'Demo photo removed locally.';
-          _messageIsError = false;
-        });
-        return;
-      }
+
       await run(() async {
         await auth.service.request('DELETE', '/api/v1/users/me/profile-image');
         await load();
@@ -242,13 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           message: 'Choose a JPEG, PNG or WebP image up to 5 MB.',
         );
       }
-      if (auth.isDemo) {
-        setState(() {
-          _demoPhoto = bytes;
-          _message = 'Demo photo preview updated. Nothing was uploaded.';
-        });
-        return;
-      }
+
       await auth.service.request(
         'POST',
         '/api/v1/users/me/profile-image',
@@ -440,8 +423,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final name =
         '${auth.user?['firstName'] ?? ''} ${auth.user?['lastName'] ?? ''}'
             .trim();
-    final hasPhoto =
-        _demoPhoto != null || (imageUrl is String && imageUrl.isNotEmpty);
+    final hasPhoto = imageUrl is String && imageUrl.isNotEmpty;
     return Form(
       key: _form,
       child: ListView(
@@ -481,9 +463,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       child: ClipOval(
-                        child: _demoPhoto != null
-                            ? Image.memory(_demoPhoto!, fit: BoxFit.cover)
-                            : imageUrl is String && imageUrl.isNotEmpty
+                        child: imageUrl is String && imageUrl.isNotEmpty
                             ? Image.network(
                                 imageUrl,
                                 fit: BoxFit.cover,
@@ -570,15 +550,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Color(0xFFB5D4C8), fontSize: 11),
                 ),
-                if (auth.isDemo)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 8),
-                    child: Text(
-                      'Demo preview only · Resets when you leave',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Color(0xFFB5D4C8), fontSize: 11),
-                    ),
-                  ),
                 if (_busy)
                   Padding(
                     padding: const EdgeInsets.only(top: 16),

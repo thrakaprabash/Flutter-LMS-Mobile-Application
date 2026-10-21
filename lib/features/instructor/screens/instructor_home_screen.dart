@@ -30,15 +30,7 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
               bottom: false,
               child: ProfileScreen(
                 onSignedOut: () {
-                  if (auth.isDemo) {
-                    Navigator.pop(context);
-                  } else {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/',
-                      (_) => false,
-                    );
-                  }
+                  Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
                 },
               ),
             )

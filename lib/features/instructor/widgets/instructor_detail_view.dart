@@ -154,13 +154,9 @@ class InstructorDetailView extends StatelessWidget {
           if ('${data[field.$1] ?? ''}'.isNotEmpty)
             StudioAction(
               title: field.$2,
-              subtitle: '${data[field.$1]}'.startsWith('demo://')
-                  ? 'Media selected locally · Demo upload simulated'
-                  : 'Open the attached resource',
+              subtitle: 'Open the attached resource',
               icon: field.$3,
-              onTap: '${data[field.$1]}'.startsWith('demo://')
-                  ? null
-                  : () => onOpenLink('${data[field.$1]}'),
+              onTap: () => onOpenLink('${data[field.$1]}'),
             ),
       ],
     );

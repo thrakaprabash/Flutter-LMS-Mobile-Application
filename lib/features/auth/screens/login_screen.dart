@@ -1,7 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-
-import '../../demo/demo_screen.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -169,19 +166,6 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 20),
             const Divider(),
             const SizedBox(height: 8),
-            if (kDebugMode)
-              OutlinedButton.icon(
-                onPressed: _busy
-                    ? null
-                    : () => Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (_) => const DemoPickerScreen(),
-                        ),
-                      ),
-                icon: const Icon(Icons.science_outlined),
-                label: const Text('Explore viva demo'),
-              ),
             const Text('New to Flutter LMS?', textAlign: TextAlign.center),
             TextButton(
               onPressed: _busy ? null : () => openFlow(register: true),

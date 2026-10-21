@@ -1,3 +1,5 @@
+> Historical milestone record: all application demo modes and sample dashboards were removed on 21 October 2026. See [current backend-only status](backend_only.md).
+
 # Days 1–5 readiness audit — 16 October 2026
 
 ## Verdict

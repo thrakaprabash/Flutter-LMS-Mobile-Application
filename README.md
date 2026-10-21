@@ -17,15 +17,12 @@ The backend is the source of truth for permissions, validation, quiz scores, ass
 
 ## Current implementation status
 
-Day 4 core API foundation is added; backend health and emulator HTTP connectivity are verified. See `docs/day_04.md` for completed checks and the remaining Postman/account blockers. The login UI still uses the Day 3 local preview.
+Authentication, profiles, student learning and assessments, and instructor course management use the real backend. All demo modes, sample role dashboards, simulated media and role pickers have been removed. Administrator totals are loaded from the protected admin dashboard endpoint. An authorized backend account is required.
 
-Day 3 is implemented: a splash screen, three-page onboarding with PageView, Student/Instructor/Admin dashboard shells, shared feedback states, and role-specific sample data separated from presentation.
+Launch flow: Splash → Onboarding or restored session → Login → Dashboard for the authenticated role. Backend roles determine access; the app cannot select a different role locally.
 
-Launch flow: Splash → Onboarding → Login → Home role preview → Dashboard. Skip and Get started clear the entry routes; Back on onboarding returns to the preceding page and cannot reopen the splash. Onboarding appears on every fresh launch for this preview; persistence and real session routing are later work. The existing UI structure follows the integration guide’s feature folders and shared core components.
+Flutter analysis and all 49 current tests pass. See [backend-only cleanup](docs/backend_only.md). Earlier milestone documents record historical development and verification.
 
-Use any valid email address and a password of at least 8 characters containing uppercase, lowercase, a number and a special character to open the local preview. This validates input only and does not authenticate an account. Home exposes all three dashboard roles. Dashboard navigation and shortcuts open explicit coming-soon states.
-
-Formatting, analysis and 10 widget tests pass. See `docs/day_03.md` for scope and verification.
 ## Technology and prerequisites
 
 | Component | Usage |
@@ -56,7 +53,7 @@ flutter devices
 
 `flutter devices` should show an Android device such as `emulator-5554`. The helper builds the app, installs it and opens **Flutter LMS**. The first build may take several minutes; wait for it to finish.
 
-**Expected result:** the green-and-white login screen shown at the end of this guide. The current login preview works without the backend after dependencies are downloaded. Future API-driven features require the backend to be running.
+**Expected result:** the login screen, or the authorized role dashboard when a session is restored. Backend connectivity is required for account and learning features.
 
 If the device ID is different, use the ID from `flutter devices`:
 
@@ -204,7 +201,7 @@ The helper temporarily uses `.build-tmp` for Java's temporary files to avoid the
 
 ## Backend installation and startup
 
-The integrated application will require the authorized LMS backend. The current login preview works without it. Obtain the approved container image name, version, API documentation and Postman collection through your organization's authorized access process. Private resource links, registry identifiers, account details and access credentials are intentionally omitted from this README.
+The application requires the authorized LMS backend. Obtain the approved container image name, version, API documentation and Postman collection through your organization's authorized access process. Private resource links, registry identifiers, account details and access credentials are intentionally omitted from this README.
 
 Install [Docker Desktop for Windows](https://docs.docker.com/desktop/setup/install/windows-install/) and [Postman Desktop](https://www.postman.com/downloads/). Start Docker Desktop and wait for its engine to be ready.
 
@@ -280,14 +277,14 @@ lib/
     utils/                          Existing validators and UI message
     widgets/                        Inputs, buttons and standard feedback states
   shared/
-    models/                         Shared dashboard preview model definitions
+    models/                         Shared pagination and response helpers
     widgets/                        Reusable dashboard shell and cards
   features/
-    auth/screens/                   Local login form (Day 2 preview)
-    home/screens/                   Development role preview
+    auth/screens/                   Backend login, registration and recovery
+
     onboarding/screens/             Splash and three onboarding pages
     student/dashboard/
-      models/                       Student sample dashboard data
+
       screens/                      StudentHomeScreen
     student/courses/widgets/        Course detail widgets
     student/learning/
@@ -305,7 +302,7 @@ lib/
       services/                     Authenticated instructor API operations
       widgets/                      Dashboard, detail views and shared studio UI
     admin/dashboard/
-      models/                       Admin sample dashboard data
+
       screens/                      AdminHomeScreen
 assets/                             Bundled illustrations, images and fonts
 android/                            Existing Android host and splash resources
@@ -349,27 +346,11 @@ GitHub repository creation, commits and pushing are handled manually by the deve
 - Keep internal API documents, shared-drive resources, backend registry details and access instructions in authorized private channels.
 - Never commit passwords, tokens, private keys, signing keystores, populated environment files or user data.
 - Keep machine-specific SDK configuration out of source control.
-- Use authenticated, role-authorized access for integrated features; the current preview does not implement those controls yet.
+- All protected features require authenticated, role-authorized backend access.
 - Use HTTPS for deployed API connections. Local HTTP addresses in this guide are development examples only.
 
 The installation links in this README point only to public software vendors and public tooling documentation. No internal data-resource links or shared conversation links are included.
 
-## Current milestone: Day 5
+## Feature verification
 
-Authentication, sessions, password recovery and profile forms now use the real backend. See [Day 5 verification and remaining acceptance checks](docs/day_05.md). Earlier Day 1-4 preview descriptions are historical.
-
-## Current milestone: Day 6
-
-Student course browsing, search, category filtering, pagination, enrollment, My Courses, curriculum, lesson viewing and server-returned progress are implemented. Debug demo sessions use the same screens with isolated in-memory learning data. See [Day 6 verification and remaining acceptance checks](docs/day_06.md). Day 1-5 milestone descriptions above are historical.
-
-## Current milestone: Day 7
-
-Student quizzes, assignment submissions/corrections, course reviews, notifications with unread counts, and profile learning summaries are implemented. See [Day 7 implementation and acceptance checks](docs/day_07.md). Real grading and statuses remain backend-controlled; debug demo data stays isolated. Earlier milestone descriptions are historical.
-
-## Current milestone: Day 8
-
-Instructor dashboard, owned-course building, sections and lessons, media uploads, quiz/question authoring, assignment publication, learner attempts/submissions, grading/corrections, enrollments and archiving are implemented. The debug Instructor demo supports these workflows with session-local sample data and simulated uploads. Open **Explore viva demo → Instructor demo** from login. Real instructor login, dashboard and draft creation were verified after the earlier backend connectivity failure; further live acceptance remains pending. See [Day 8 verification and remaining live acceptance](docs/day_08.md). Earlier milestone descriptions are historical.
-
-### Rebuilding after native package changes
-
-After adding or changing packages such as `video_player` or `url_launcher`, stop the running app and perform a full Android build/install with `./scripts/run_android.ps1`. Hot reload/restart cannot install native plugins into an older APK. If video playback reports a platform-channel connection error, rebuild/reinstall before investigating the media URL. The helper retains the installed app's local data.
+See the Day 5–8 implementation records in docs. Demo and preview descriptions in those historical records were superseded by [backend-only cleanup](docs/backend_only.md) on 21 October 2026.

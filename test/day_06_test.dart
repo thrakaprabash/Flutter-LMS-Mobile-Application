@@ -1,15 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_lms/core/network/api_client.dart';
 import 'package:flutter_lms/core/storage/token_storage.dart';
 import 'package:flutter_lms/features/auth/services/account_service.dart';
-import 'package:flutter_lms/features/demo/demo_screen.dart';
-import 'package:flutter_lms/features/demo/demo_learning_service.dart';
 import 'package:flutter_lms/features/student/learning/services/learning_service.dart';
 import 'package:flutter_lms/features/student/learning/screens/learning_screens.dart';
-import 'package:flutter_lms/shared/providers/auth_provider.dart';
-import 'package:provider/provider.dart';
 
 import 'core_api_test.dart' show FakeAdapter, body;
 
@@ -136,32 +131,6 @@ void main() {
     );
   });
   test(
-    'demo learning never sends backend requests and resets per session',
-    () async {
-      final client = ApiClient(storage);
-      client.dio.httpClientAdapter = FakeAdapter(
-        (_) => throw StateError('Demo reached backend'),
-      );
-      final s = DemoLearningService(AccountService(client));
-      await s.enroll('demo-course');
-      await s.complete('demo-TEXT');
-      await s.complete('demo-TEXT');
-      expect(
-        object(
-          (await s.progress('demo-course'))['enrollment'],
-        )['progressPercentage'],
-        closeTo(100 / 3, 0.001),
-      );
-      expect((await s.enrollments(1, 'ACTIVE')).items, hasLength(1));
-      expect(
-        (await DemoLearningService(
-          AccountService(client),
-        ).enrollments(1, 'ACTIVE')).items,
-        isEmpty,
-      );
-    },
-  );
-  test(
     'protected learning preserves forbidden and missing-content errors',
     () async {
       final client = ApiClient(storage);
@@ -187,93 +156,6 @@ void main() {
           predicate((e) => learningError(e as Object) == 'Lesson not found.'),
         ),
       );
-    },
-  );
-  testWidgets('student browse fits narrow screen with large text', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(320, 568);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    tester.platformDispatcher.textScaleFactorTestValue = 1.5;
-    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-    final auth = DemoAuthProvider(
-      DemoAccountService(ApiClient(storage), 'STUDENT'),
-      storage,
-    );
-    await tester.pumpWidget(
-      ChangeNotifierProvider<AuthProvider>.value(
-        value: auth,
-        child: const MaterialApp(home: StudentLearningHome()),
-      ),
-    );
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Explore'));
-    await tester.pumpAndSettle();
-    expect(find.text('Find your next course'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-  testWidgets(
-    'demo student browses, enrolls, completes a lesson and refreshes progress',
-    (tester) async {
-      final auth = DemoAuthProvider(
-        DemoAccountService(ApiClient(storage), 'STUDENT'),
-        storage,
-      );
-      await tester.pumpWidget(
-        ChangeNotifierProvider<AuthProvider>.value(
-          value: auth,
-          child: const MaterialApp(home: StudentLearningHome()),
-        ),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Explore'));
-      await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(
-        find.text('View course'),
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('View course'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('View course'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Enroll now'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(seconds: 4));
-      await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(
-        find.text('Getting started'),
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Getting started'));
-      await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Explore text lessons'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Explore text lessons'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Mark complete'));
-      await tester.pumpAndSettle();
-      expect(find.text('Lesson completed'), findsOneWidget);
-      await tester.pageBack();
-      await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(
-        find.textContaining('33.3%'),
-        -200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(find.textContaining('33.3%'), findsOneWidget);
-      await tester.scrollUntilVisible(
-        find.text('Getting started'),
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(find.textContaining('Completed'), findsWidgets);
-      expect(tester.takeException(), isNull);
     },
   );
 }

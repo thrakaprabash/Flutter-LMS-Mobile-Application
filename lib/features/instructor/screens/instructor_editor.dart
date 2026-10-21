@@ -156,13 +156,12 @@ class InstructorEditor extends StatefulWidget {
     required this.onSave,
     this.initial = const {},
     this.categories = const [],
-    this.demo = false,
   });
   final String title;
   final List<EditorField> fields;
   final Record initial;
   final List<Record> categories;
-  final bool demo;
+
   final Future<void> Function(Record) onSave;
   @override
   State<InstructorEditor> createState() => _InstructorEditorState();
@@ -700,19 +699,6 @@ class _InstructorEditorState extends State<InstructorEditor> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (widget.demo)
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      margin: const EdgeInsets.only(bottom: 18),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEDF1E3),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text(
-                        'Demo workspace · Changes stay in this session.',
-                        style: TextStyle(fontSize: 12, color: studioMuted),
-                      ),
-                    ),
                   const Text(
                     'Make it clear. Make it yours.',
                     style: TextStyle(

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../shared/providers/auth_provider.dart';
 import '../../../profile/screens/profile_screen.dart';
-import '../../../demo/demo_learning_service.dart';
+
 import '../../learning/services/learning_service.dart';
 import '../../courses/screens/course_list_screen.dart';
 import '../../notifications/screens/notifications_screen.dart';
@@ -16,9 +16,7 @@ class StudentLearningHome extends StatelessWidget {
     final auth = context.watch<AuthProvider>();
     return Provider<LearningService>(
       key: ObjectKey(auth),
-      create: (_) => auth.isDemo
-          ? DemoLearningService(auth.service)
-          : LearningService(auth.service),
+      create: (_) => LearningService(auth.service),
       child: const _LearningHome(),
     );
   }
@@ -115,11 +113,7 @@ class _LearningHomeState extends State<_LearningHome> {
     body: tab == 3
         ? ProfileScreen(
             onSignedOut: () {
-              if (context.read<AuthProvider>().isDemo) {
-                Navigator.pop(context);
-              } else {
-                Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
-              }
+              Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
             },
           )
         : CourseList(

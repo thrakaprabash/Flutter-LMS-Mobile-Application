@@ -1,3 +1,5 @@
+> Historical milestone record: all application demo modes and sample dashboards were removed on 21 October 2026. See [current backend-only status](backend_only.md).
+
 # Day 6 - Student learning
 
 Implemented on 19 October 2026 against the supplied task plan, integration guide, backend report and Postman collection. The backend contract remains authoritative.

@@ -6,7 +6,6 @@ import '../../core/storage/token_storage.dart';
 import '../../features/auth/services/account_service.dart';
 
 class AuthProvider extends ChangeNotifier {
-  bool get isDemo => false;
   AuthProvider(this.service, this.storage);
   final AccountService service;
   final TokenStorage storage;

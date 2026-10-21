@@ -4,13 +4,29 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_lms/core/network/api_client.dart';
 import 'package:flutter_lms/core/storage/token_storage.dart';
-import 'package:flutter_lms/features/demo/demo_screen.dart';
+import 'package:flutter_lms/features/auth/services/account_service.dart';
 import 'package:flutter_lms/features/profile/screens/profile_screen.dart';
 import 'package:flutter_lms/shared/providers/auth_provider.dart';
 
-class SaveService extends DemoAccountService {
-  SaveService(ApiClient client, this.fail) : super(client, 'STUDENT');
+class SaveService extends AccountService {
+  SaveService(super.client, this.fail);
   final bool fail;
+  final user = <String, dynamic>{
+    'id': 'user',
+    'role': 'STUDENT',
+    'firstName': 'Test',
+    'lastName': 'User',
+    'email': 'test@example.com',
+  };
+  final profile = <String, dynamic>{
+    'learningGoals': ['Learn Flutter', 'Build mobile apps'],
+    'educationLevel': 'Undergraduate',
+  };
+  @override
+  Future<Map<String, dynamic>> fullProfile() async => {
+    'user': {...user},
+    'profile': {...profile},
+  };
   final writes = <String>[];
   @override
   Future<Map<String, dynamic>> request(
@@ -26,13 +42,14 @@ class SaveService extends DemoAccountService {
         throw const FormatException('Test failure');
       }
     }
-    return super.request(
-      method,
-      path,
-      data: data,
-      public: public,
-      progress: progress,
-    );
+    if (method == 'PATCH' && data is Map) {
+      if (path.contains('/profiles/')) {
+        profile.addAll(Map<String, dynamic>.from(data));
+      } else {
+        user.addAll(Map<String, dynamic>.from(data));
+      }
+    }
+    return {'data': {}};
   }
 }
 
@@ -42,7 +59,7 @@ void main() {
       FlutterSecureStorage.setMockInitialValues({});
       const storage = TokenStorage(FlutterSecureStorage());
       final service = SaveService(ApiClient(storage), fail);
-      final auth = DemoAuthProvider(service, storage);
+      final auth = AuthProvider(service, storage);
       await tester.pumpWidget(
         ChangeNotifierProvider<AuthProvider>.value(
           value: auth,
@@ -70,7 +87,7 @@ void main() {
       ]);
       expect(auth.user?['firstName'], 'Updated');
       expect(
-        service.profile?['learningGoals'],
+        service.profile['learningGoals'],
         fail ? ['Learn Flutter', 'Build mobile apps'] : ['New goal'],
       );
       if (fail) {

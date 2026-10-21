@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../shared/providers/auth_provider.dart';
 
 import '../../features/auth/screens/login_screen.dart';
-import '../../features/home/screens/home_screen.dart';
+
 import '../../features/onboarding/screens/entry_screens.dart';
 import '../../features/student/dashboard/screens/student_home_screen.dart';
 import '../../features/instructor/screens/instructor_home_screen.dart';
@@ -16,7 +16,7 @@ abstract final class AppRouter {
   static Map<String, WidgetBuilder> get routes => {
     RouteNames.splash: (_) => const SplashScreen(),
     RouteNames.login: (_) => const LoginScreen(),
-    RouteNames.home: (_) => const ProtectedScreen(child: HomeScreen()),
+    RouteNames.home: (_) => const ProtectedScreen(child: SizedBox.shrink()),
     RouteNames.onboarding: (_) => const OnboardingScreen(),
     RouteNames.student: (_) =>
         const ProtectedScreen(role: 'STUDENT', child: StudentHomeScreen()),

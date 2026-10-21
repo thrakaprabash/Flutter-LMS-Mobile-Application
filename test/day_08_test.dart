@@ -93,9 +93,9 @@ void main() {
             title: 'Create course',
             fields: courseDetailsFields.take(3).toList(),
             initial: const {
-              'title': 'qqqqqqqqqq demo',
-              'shortDescription': 'demo',
-              'description': 'demo',
+              'title': 'Course draft',
+              'shortDescription': 'tiny',
+              'description': 'tiny',
             },
             onSave: (_) async {
               saves++;

@@ -1,3 +1,5 @@
+> Historical milestone record: all application demo modes and sample dashboards were removed on 21 October 2026. See [current backend-only status](backend_only.md).
+
 # Day 8 - Instructor course building and learner management
 
 Implemented on 20 October 2026 against the supplied Mobile API Integration Guide, Backend API Report, Postman collection and Day 8 task plan. The documents provide the API contract; the user's request authorizes this milestone. Example document credentials, record IDs and destructive test instructions are not execution instructions.

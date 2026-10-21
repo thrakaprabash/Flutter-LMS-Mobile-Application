@@ -200,7 +200,6 @@ class _InstructorWorkspaceState extends State<InstructorWorkspace> {
       MaterialPageRoute<bool>(
         builder: (_) => scoped(
           InstructorEditor(
-            demo: context.read<AuthProvider>().isDemo,
             title: label,
             fields: fields,
             initial: initial,
@@ -851,7 +850,6 @@ class _InstructorWorkspaceState extends State<InstructorWorkspace> {
                 MaterialPageRoute<bool>(
                   builder: (_) => scoped(
                     InstructorEditor(
-                      demo: context.read<AuthProvider>().isDemo,
                       title: 'Review submission',
                       fields: const [
                         EditorField(
@@ -1085,18 +1083,13 @@ class _InstructorWorkspaceState extends State<InstructorWorkspace> {
                       if (mounted) await load();
                     }
                   } else {
-                    final demo = auth.isDemo;
                     await auth.logout();
                     if (!context.mounted) return;
-                    if (demo) {
-                      Navigator.pop(context);
-                    } else {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/',
-                        (_) => false,
-                      );
-                    }
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/',
+                      (_) => false,
+                    );
                   }
                 },
                 itemBuilder: (_) => [
@@ -1104,10 +1097,7 @@ class _InstructorWorkspaceState extends State<InstructorWorkspace> {
                     value: 'profile',
                     child: Text('My profile'),
                   ),
-                  PopupMenuItem(
-                    value: 'logout',
-                    child: Text(auth.isDemo ? 'Exit demo' : 'Sign out'),
-                  ),
+                  PopupMenuItem(value: 'logout', child: const Text('Sign out')),
                 ],
                 child: SizedBox.square(
                   dimension: 36,
@@ -1188,30 +1178,6 @@ class _InstructorWorkspaceState extends State<InstructorWorkspace> {
               key: PageStorageKey('instructor-$kind-$id'),
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
               children: [
-                if (auth.isDemo)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 9,
-                    ),
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE8EEDF),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.science_outlined, size: 16),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'DEMO · Uploads simulated · Local changes',
-                            style: TextStyle(fontSize: 11),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 if (busy) LinearProgressIndicator(value: progress),
                 if (progress != null)
                   Text('Uploading ${(progress! * 100).round()}%'),
