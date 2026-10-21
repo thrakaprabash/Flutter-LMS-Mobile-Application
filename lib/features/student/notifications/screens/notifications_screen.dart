@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../widgets/student_ui.dart';
 
-import '../../learning/screens/learning_screens.dart';
+import '../../../../shared/utils/learning_error.dart';
+import '../../learning/learning_scope.dart';
 import '../../learning/services/learning_service.dart';
 import '../../widgets/activity_widgets.dart';
 

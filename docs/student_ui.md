@@ -6,4 +6,17 @@ Course collections use `ListView.builder` and the reusable `CourseCard` in `lib/
 
 Shared student headings, panels and empty states live in `lib/features/student/widgets/student_ui.dart`. Lessons use a readable text panel. Assignment instructions and submission fields have distinct sections; quiz information and question cards have consistent spacing. Notifications and activity lists use the same visual language. Role access, enrollment checks and backend operations remain in their existing flows; demo state remains separate.
 
-Verification: Flutter analysis passed; all 68 tests passed. Navigation is checked at 412px and 320px widths, including 1.5x text scaling. Preview images are under `docs/evidence/student-*.png`; regenerate with `flutter test test/student_navigation_test.dart --dart-define=STUDENT_PREVIEWS=true`.
+The learning UI is split by responsibility:
+
+- `dashboard/screens/student_learning_home.dart`: student navigation and service scope.
+- `courses/screens/course_list_screen.dart`: course loading, pagination and lazy course lists.
+- `courses/widgets/course_list_header.dart`: search, category selection and enrollment status filters.
+- `courses/screens/course_details_screen.dart`: course state, enrollment and navigation actions.
+- `courses/widgets/course_details_view.dart`: course detail layout.
+- `courses/widgets/course_section_tile.dart`: expandable curriculum and lesson loading.
+- `learning/screens/lesson_screen.dart`: lesson viewing, playback and completion.
+- `learning/learning_scope.dart`: protected learning route scope.
+
+`learning/screens/learning_screens.dart` is a small compatibility export file. Feature implementations import focused files directly.
+
+Verification after the split: Flutter analysis passed; all 69 tests passed. Navigation is checked at 412px and 320px widths, including 1.5x text scaling. Preview images are under `docs/evidence/student-*.png`; regenerate with `flutter test test/student_navigation_test.dart --dart-define=STUDENT_PREVIEWS=true`.

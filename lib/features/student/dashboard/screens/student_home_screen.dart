@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../learning/screens/learning_screens.dart';
+import 'student_learning_home.dart';
 
 class StudentHomeScreen extends StatelessWidget {
   const StudentHomeScreen({super.key});

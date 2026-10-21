@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 
 import '../../../shared/providers/auth_provider.dart';
-import '../learning/screens/learning_screens.dart';
+import '../../../shared/utils/learning_error.dart';
 import '../learning/services/learning_service.dart';
 import '../services/student_activity_service.dart';
 import 'student_ui.dart';

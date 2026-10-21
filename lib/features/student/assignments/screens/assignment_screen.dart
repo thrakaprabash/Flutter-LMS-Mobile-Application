@@ -9,7 +9,7 @@ import 'package:mime/mime.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../learning/services/learning_service.dart';
-import '../../learning/screens/learning_screens.dart';
+import '../../../../shared/utils/learning_error.dart';
 import '../../widgets/activity_widgets.dart';
 
 class AssignmentScreen extends StatefulWidget {

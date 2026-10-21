@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../shared/providers/auth_provider.dart';
-import '../../learning/screens/learning_screens.dart';
+import '../../../../shared/utils/learning_error.dart';
 import '../../learning/services/learning_service.dart';
 import '../../widgets/activity_widgets.dart';
 
