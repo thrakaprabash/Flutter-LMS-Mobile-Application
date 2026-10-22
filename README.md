@@ -339,6 +339,10 @@ To check one area, run `flutter test test/<filename>` using the files below:
 
 Additional tests cover role dashboards, admin layouts, learning widgets, video playback and profile saving.
 
+Deletion coverage is in `delete_actions_test.dart` and `profile_review_deletion_test.dart`.
+Instructor delete controls are in course Settings, section, lesson, quiz/question and assignment workspaces. Students can delete their own review. Student and instructor profiles offer **Delete Profile** under Account & security; this preserves the user account and allows profile recreation through Save changes.
+Every delete requires confirmation. Published lessons must be unpublished before removing media; published quiz questions cannot be deleted. Known quiz attempts and assignment submissions hide protected deletion actions, and the backend enforces these restrictions when counts are unavailable. Section deletion warns that related learning content and records are also removed.
+
 During initial verification, formatting and analysis passed, both UI tests passed, and the Android debug APK built, installed and opened successfully on an emulator. The direct build/install steps succeeded; the helper packages those steps for repeat use. The normal Flutter launcher still encountered system memory pressure in a follow-up check.
 
 ## Packages and role flows

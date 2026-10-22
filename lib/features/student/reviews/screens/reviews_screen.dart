@@ -95,6 +95,27 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
     message = 'Review saved.';
     if (mounted) await load();
   });
+  Future<void> deleteReview() async {
+    if (busy || mine == null) return;
+    final id = recordId(mine!);
+    if (!await confirmActivity(
+      context,
+      'Delete your review?',
+      'Permanently delete your rating and comment? Course ratings will be recalculated.',
+    )) {
+      return;
+    }
+    if (!mounted) return;
+    await run(() async {
+      await activityService(context).mutate('DELETE', '/api/v1/reviews/$id');
+      mine = null;
+      comment.clear();
+      rating = 5;
+      message = 'Review deleted.';
+      await load();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -217,6 +238,12 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                   ],
                 ),
               ),
+            ),
+          if (mine != null)
+            TextButton.icon(
+              onPressed: busy ? null : deleteReview,
+              icon: const Icon(Icons.delete_outline),
+              label: const Text('Delete my review'),
             ),
           const SizedBox(height: 28),
           Text('Learner reviews', style: theme.textTheme.titleLarge),

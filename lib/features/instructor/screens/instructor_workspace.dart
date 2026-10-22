@@ -288,6 +288,54 @@ class _InstructorWorkspaceState extends State<InstructorWorkspace> {
     }
   }
 
+  Future<void> remove(
+    String label,
+    String path,
+    String warning, {
+    bool leave = false,
+  }) async {
+    if (busy || locked || !await confirmActivity(context, '$label?', warning)) {
+      return;
+    }
+    if (!mounted) return;
+    setState(() {
+      busy = true;
+      error = null;
+    });
+    try {
+      await service.save('DELETE', path);
+      if (!mounted) return;
+      if (leave) {
+        Navigator.pop(context);
+      } else {
+        final field = switch (path.split('/').last) {
+          'thumbnail' => 'thumbnailUrl',
+          'video' => 'videoUrl',
+          'document' => 'documentUrl',
+          'attachment' => 'attachmentUrl',
+          _ => null,
+        };
+        if (field != null) entity[field] = null;
+        await load();
+      }
+    } catch (e) {
+      if (mounted) setState(() => error = learningError(e));
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  Widget deleteButton(
+    String label,
+    String path,
+    String warning, {
+    bool leave = false,
+  }) => button(
+    label,
+    () => remove(label, path, warning, leave: leave),
+    Icons.delete_outline,
+  );
+
   Future<void> upload(String field, String path) async {
     final extensions = switch (field) {
       'thumbnail' => ['jpg', 'jpeg', 'png', 'webp'],
@@ -581,6 +629,12 @@ class _InstructorWorkspaceState extends State<InstructorWorkspace> {
                     errorBuilder: (_, e, st) => const SizedBox.shrink(),
                   ),
                 ),
+              if ('${entity['thumbnailUrl'] ?? ''}'.isNotEmpty)
+                deleteButton(
+                  'Remove thumbnail',
+                  '$base/thumbnail',
+                  'Remove the course thumbnail? The course will remain.',
+                ),
               const SizedBox(height: 16),
               StudioAction(
                 title: 'Archive course',
@@ -648,6 +702,12 @@ class _InstructorWorkspaceState extends State<InstructorWorkspace> {
                   ),
                   Icons.reorder,
                 ),
+                deleteButton(
+                  'Delete section',
+                  '$api/sections/$id',
+                  'Permanently delete this section, its lessons, assessments, submissions, progress and stored media? This cannot be undone.',
+                  leave: true,
+                ),
                 button(
                   'Add lesson',
                   () => edit(
@@ -689,6 +749,37 @@ class _InstructorWorkspaceState extends State<InstructorWorkspace> {
                     () => upload('document', '$api/lessons/$id/document'),
                     Icons.upload_file,
                   ),
+                if (entity['isPublished'] == true)
+                  button(
+                    'Unpublish lesson',
+                    () => action(
+                      'Unpublish lesson',
+                      '$api/lessons/$id',
+                      data: {'isPublished': false},
+                      confirm: true,
+                    ),
+                    Icons.visibility_off_outlined,
+                  ),
+                if (entity['isPublished'] != true &&
+                    '${entity['videoUrl'] ?? ''}'.isNotEmpty)
+                  deleteButton(
+                    'Remove video',
+                    '$api/lessons/$id/video',
+                    'Permanently remove this video? The lesson will remain.',
+                  ),
+                if (entity['isPublished'] != true &&
+                    '${entity['documentUrl'] ?? ''}'.isNotEmpty)
+                  deleteButton(
+                    'Remove document',
+                    '$api/lessons/$id/document',
+                    'Permanently remove this document? The lesson will remain.',
+                  ),
+                deleteButton(
+                  'Delete lesson',
+                  '$api/lessons/$id',
+                  'Permanently delete this lesson, its progress and stored media? This cannot be undone.',
+                  leave: true,
+                ),
                 if (entity['isPublished'] != true && lessonReady(entity))
                   button(
                     'Publish lesson',
@@ -761,6 +852,18 @@ class _InstructorWorkspaceState extends State<InstructorWorkspace> {
                     Icons.publish,
                   ),
               ],
+              if (!locked &&
+                  !(entity['isPublished'] == true &&
+                      ((entity['attemptCount'] as num?) ??
+                              (entity['totalAttempts'] as num?) ??
+                              0) >
+                          0))
+                deleteButton(
+                  'Delete quiz',
+                  '$api/quizzes/$id',
+                  'Permanently delete this quiz and its questions? Published quizzes with attempts cannot be deleted.',
+                  leave: true,
+                ),
               button(
                 'Student attempts',
                 () => open('attempts', id),
@@ -768,7 +871,15 @@ class _InstructorWorkspaceState extends State<InstructorWorkspace> {
               ),
             ],
           ),
-          for (final q in records(entity['questions']))
+          for (final (questionIndex, q) in records(
+            entity['questions'],
+          ).indexed) ...[
+            if (!quizLocked)
+              deleteButton(
+                'Delete question ${questionIndex + 1}',
+                '$api/quiz-questions/${recordId(q)}',
+                'Permanently delete this question? Remaining questions will be reordered.',
+              ),
             StudioQuestionCard(
               q,
               onEdit: quizLocked || busy
@@ -781,6 +892,7 @@ class _InstructorWorkspaceState extends State<InstructorWorkspace> {
                       method: 'PATCH',
                     ),
             ),
+          ],
         ];
       case 'assignments':
         return [
@@ -817,6 +929,22 @@ class _InstructorWorkspaceState extends State<InstructorWorkspace> {
                   () => upload('attachment', '$api/assignments/$id/attachment'),
                   Icons.attach_file,
                 ),
+                if ('${entity['attachmentUrl'] ?? ''}'.isNotEmpty)
+                  deleteButton(
+                    'Remove attachment',
+                    '$api/assignments/$id/attachment',
+                    'Permanently remove the attachment? The assignment will remain.',
+                  ),
+                if (((entity['submissionCount'] as num?) ??
+                        (entity['totalSubmissions'] as num?) ??
+                        0) ==
+                    0)
+                  deleteButton(
+                    'Delete assignment',
+                    '$api/assignments/$id',
+                    'Permanently delete this assignment and attachment? Assignments with student submissions cannot be deleted.',
+                    leave: true,
+                  ),
                 if (entity['isPublished'] != true)
                   button(
                     'Publish assignment',

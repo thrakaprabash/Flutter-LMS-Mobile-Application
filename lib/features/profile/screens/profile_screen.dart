@@ -10,6 +10,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 
 import '../../../shared/providers/auth_provider.dart';
+import '../../../shared/widgets/confirmation_dialog.dart';
 import '../../../core/network/api_exception.dart';
 import '../../student/learning/widgets/student_learning_summary.dart';
 import '../../student/learning/services/learning_service.dart';
@@ -248,6 +249,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
       await load();
       if (mounted) setState(() => _message = 'Profile photo updated.');
+    });
+  }
+
+  Future<void> deleteProfile() async {
+    final auth = context.read<AuthProvider>();
+    if (_busy ||
+        !['STUDENT', 'INSTRUCTOR'].contains(auth.role) ||
+        auth.profile == null) {
+      return;
+    }
+    final role = auth.role!.toLowerCase();
+    if (!await confirmActivity(
+      context,
+      'Delete $role profile?',
+      'Permanently remove your $role profile details? Your account will remain active. You can recreate the profile by saving new details.',
+    )) {
+      return;
+    }
+    if (!mounted) return;
+    await run(() async {
+      await auth.service.request('DELETE', '/api/v1/profiles/$role/me');
+      auth.profile = null;
+      for (final key in [
+        'dateOfBirth',
+        'educationLevel',
+        'learningGoals',
+        'headline',
+        'qualification',
+        'experienceYears',
+        'expertise',
+        'biography',
+      ]) {
+        field(key).clear();
+      }
+      await load();
+      if (mounted) _message = 'Profile deleted. Your account remains active.';
     });
   }
 
@@ -632,6 +669,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             title: 'Account & security',
             subtitle: 'Manage your signed-in sessions',
             children: [
+              if (['STUDENT', 'INSTRUCTOR'].contains(auth.role) &&
+                  auth.profile != null)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.delete_outline, color: colors.error),
+                  title: const Text('Delete Profile'),
+                  subtitle: const Text(
+                    'Remove profile details; keep your account',
+                  ),
+                  onTap: _busy ? null : deleteProfile,
+                ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: Icon(Icons.logout_rounded, color: colors.error),
