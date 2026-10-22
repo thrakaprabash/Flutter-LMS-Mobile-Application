@@ -15,7 +15,11 @@ class InstructorHomeScreen extends StatefulWidget {
 
 class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
   int tab = 0;
-  void select(int index) => setState(() => tab = index);
+  final visited = <int>{0};
+  void select(int index) => setState(() {
+    tab = index;
+    visited.add(index);
+  });
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
@@ -25,20 +29,33 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
       );
     }
     return Scaffold(
-      body: tab == 3
-          ? SafeArea(
-              bottom: false,
-              child: ProfileScreen(
-                onSignedOut: () {
-                  Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
-                },
-              ),
-            )
-          : InstructorWorkspace(
-              key: ValueKey(tab),
-              kind: ['home', 'courses', 'learners'][tab],
-              onDestinationSelected: select,
-            ),
+      body: IndexedStack(
+        index: tab,
+        children: [
+          for (var index = 0; index < 3; index++)
+            visited.contains(index)
+                ? InstructorWorkspace(
+                    key: ValueKey(index),
+                    kind: ['home', 'courses', 'learners'][index],
+                    onDestinationSelected: select,
+                  )
+                : const SizedBox.shrink(),
+          visited.contains(3)
+              ? SafeArea(
+                  bottom: false,
+                  child: ProfileScreen(
+                    onSignedOut: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/',
+                        (_) => false,
+                      );
+                    },
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ],
+      ),
       bottomNavigationBar: DecoratedBox(
         decoration: const BoxDecoration(
           color: Colors.white,

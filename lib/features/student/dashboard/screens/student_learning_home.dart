@@ -14,6 +14,11 @@ class StudentLearningHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    if (!auth.authenticated || auth.role != 'STUDENT') {
+      return const Scaffold(
+        body: Center(child: Text('Student access required.')),
+      );
+    }
     return Provider<LearningService>(
       key: ObjectKey(auth),
       create: (_) => LearningService(auth.service),
@@ -30,6 +35,11 @@ class _LearningHome extends StatefulWidget {
 
 class _LearningHomeState extends State<_LearningHome> {
   int tab = 0;
+  final visited = <int>{0};
+  void select(int index) => setState(() {
+    tab = index;
+    visited.add(index);
+  });
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
@@ -50,7 +60,7 @@ class _LearningHomeState extends State<_LearningHome> {
             padding: const EdgeInsets.only(right: 16),
             child: IconButton(
               tooltip: 'My profile',
-              onPressed: () => setState(() => tab = 3),
+              onPressed: () => select(3),
               icon: Builder(
                 builder: (context) {
                   final user = context.watch<AuthProvider>().user;
@@ -87,7 +97,7 @@ class _LearningHomeState extends State<_LearningHome> {
       indicatorColor: const Color(0xFFE5EEDC),
       height: 76,
       selectedIndex: tab,
-      onDestinationSelected: (i) => setState(() => tab = i),
+      onDestinationSelected: select,
       destinations: const [
         NavigationDestination(
           icon: Icon(Icons.space_dashboard_outlined),
@@ -110,17 +120,26 @@ class _LearningHomeState extends State<_LearningHome> {
         ),
       ],
     ),
-    body: tab == 3
-        ? ProfileScreen(
-            onSignedOut: () {
-              Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
-            },
-          )
-        : CourseList(
-            key: ValueKey(tab),
-            mine: tab != 1,
-            dashboard: tab == 0,
-            onExplore: () => setState(() => tab = 1),
-          ),
+    body: IndexedStack(
+      index: tab,
+      children: [
+        for (var index = 0; index < 3; index++)
+          visited.contains(index)
+              ? CourseList(
+                  key: ValueKey(index),
+                  mine: index != 1,
+                  dashboard: index == 0,
+                  onExplore: () => select(1),
+                )
+              : const SizedBox.shrink(),
+        visited.contains(3)
+            ? ProfileScreen(
+                onSignedOut: () {
+                  Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
+                },
+              )
+            : const SizedBox.shrink(),
+      ],
+    ),
   );
 }

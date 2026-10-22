@@ -32,7 +32,14 @@ void main() {
           expect(request.headers['Authorization'], 'Bearer test-access');
           if (request.uri.path == '/api/v1/dashboard/admin') {
             return body(200, {
-              'data': {'totalUsers': 21, 'totalCourses': 4},
+              'data': {
+                'totalStudents': 21,
+                'totalInstructors': 4,
+                'activeUsers': 24,
+                'publishedCourses': 7,
+                'totalEnrollments': 95,
+                'completedEnrollments': 0,
+              },
             });
           }
           if (request.uri.path == '/api/v1/dashboard/instructor') {
@@ -77,7 +84,13 @@ void main() {
             _ => '/api/v1/enrollments/me',
           }),
         );
-        if (role == 'ADMIN') expect(find.text('21'), findsOneWidget);
+        if (role == 'ADMIN') {
+          for (final value in ['21', '4', '24', '7', '95', '0']) {
+            expect(find.text(value), findsOneWidget);
+          }
+          expect(find.text('—'), findsNothing);
+          expect(find.byType(LinearProgressIndicator), findsNothing);
+        }
         expect(find.textContaining('Sample data'), findsNothing);
         expect(find.text('Explore viva demo'), findsNothing);
         expect(tester.takeException(), isNull);

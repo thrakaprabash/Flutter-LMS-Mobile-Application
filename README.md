@@ -17,11 +17,11 @@ The backend is the source of truth for permissions, validation, quiz scores, ass
 
 ## Current implementation status
 
-Authentication, profiles, student learning and assessments, and instructor course management use the real backend. All demo modes, sample role dashboards, simulated media and role pickers have been removed. Administrator totals are loaded from the protected admin dashboard endpoint. An authorized backend account is required.
+Authentication, profiles, student learning and assessments, instructor course management, and Day 9 administrator management use backend services. Admin includes users, categories, courses, enrollments and review moderation. All demo modes, sample role dashboards, simulated media and role pickers have been removed. An authorized backend account is required. See [Day 9 implementation and API limitations](docs/day_09.md).
 
 Launch flow: Splash → Onboarding or restored session → Login → Dashboard for the authenticated role. Backend roles determine access; the app cannot select a different role locally.
 
-Flutter analysis and all 49 current tests pass. See [backend-only cleanup](docs/backend_only.md). Earlier milestone documents record historical development and verification.
+See [backend-only cleanup](docs/backend_only.md) and [Day 9 verification](docs/day_09.md). Earlier milestone documents record historical development and verification.
 
 ## Technology and prerequisites
 
