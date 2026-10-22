@@ -6,7 +6,7 @@ This README describes the application, required software, Windows installation s
 
 ## Project overview
 
-| Role | Planned application capabilities |
+| Role | Application capabilities |
 | --- | --- |
 | Student | Register and verify an account, browse and enroll in courses, access lessons, track learning progress, complete quizzes, submit assignments, review courses, read notifications and manage a profile. |
 | Instructor | Build and publish courses, sections and lessons; upload learning materials; manage quizzes and assignments; review attempts and submissions; grade work and inspect enrollments. |
@@ -32,7 +32,7 @@ See [backend-only cleanup](docs/backend_only.md) and [Day 9 verification](docs/d
 | Git | Version control using the supplied Conventional Commits guide. |
 | Docker Desktop | Runs the supplied LMS backend for API development. |
 | Postman Desktop | Verifies backend requests before Flutter integration. |
-| Dio, secure storage and Provider | Installed for the Day 4 core network and secure-storage foundation. |
+| Dio, secure storage and Provider | HTTP transport, secure session tokens and application state. |
 
 The instructions below target a Windows PC running the app in an Android emulator. Only the Android platform is currently included in the repository.
 
@@ -197,7 +197,7 @@ The helper temporarily uses `.build-tmp` for Java's temporary files to avoid the
 | Kotlin `Could not close incremental caches` while compiling an Android plugin | This Windows setup disables Kotlin incremental compilation with `kotlin.incremental=false` in `android/gradle.properties`. Keep this setting when running `flutter run`; Kotlin compilation may take longer. |
 | PowerShell blocks the helper script | Use the normal Flutter command from an ordinary terminal, or use an execution policy approved for your PC. On managed PCs, ask your administrator. |
 | Visual Studio warning in Flutter Doctor | This project targets Android. Missing Windows C++ desktop tools do not block the Android target. |
-| Login does not open a dashboard | Use a valid email and 8 or more password characters to open Home. Dashboard routes are placeholders; API authentication is scheduled later. |
+| Login does not open a dashboard | Check backend connectivity, account verification/status and returned role. Authentication requires an authorized backend account; a valid-looking email alone does not grant access. |
 
 ## Backend installation and startup
 
@@ -264,7 +264,7 @@ Store passwords and tokens in your approved local secret storage. Do not publish
 
 The emulator uses `10.0.2.2` to reach the Windows host. Do not use `localhost` for the host backend from inside the emulator. Keep `/api/v1` out of the base URL because endpoint paths already include it; append only the endpoint paths defined in the authorized API contract.
 
-The current app has no API client or base URL configuration. When the network layer is implemented, configure the emulator address, Android Internet permission and development-only cleartext HTTP access as required by the integration guide. A deployed backend should use HTTPS. These are planned integration requirements, not completed application features.
+`AppConfig` defaults to `http://10.0.2.2:5000`. Endpoint constants include `/api/v1`. For another server, run `flutter run --dart-define=API_BASE_URL=https://your-approved-host`. Android Internet permission and local development HTTP access are configured. Use HTTPS for deployed backends.
 
 ## Project structure
 
@@ -307,10 +307,10 @@ lib/
 assets/                             Bundled illustrations, images and fonts
 android/                            Existing Android host and splash resources
 test/                               Login, entry flow, dashboard and state tests
-docs/day_03.md                      Current milestone scope and verification
+docs/day_10.md                      Final quality and acceptance record
 ```
 
-Current milestone is Day 3. The guide's network, storage, API constants, services, providers, session models and later feature folders are deferred until their scheduled days are explicitly authorized. Only folders containing implemented Day 1-3 code are created.
+Current milestone: Day 10 quality review and handover. Networking, secure storage, services, Provider state and role features are implemented. See [Day 10 acceptance record](docs/day_10.md) for verification and remaining live checks.
 
 ## Check code quality
 
@@ -324,18 +324,30 @@ flutter test --concurrency=1
 
 During initial verification, formatting and analysis passed, both UI tests passed, and the Android debug APK built, installed and opened successfully on an emulator. The direct build/install steps succeeded; the helper packages those steps for repeat use. The normal Flutter launcher still encountered system memory pressure in a follow-up check.
 
-## Planned development
+## Packages and role flows
 
-The remaining application work includes API-backed role dashboards, secure API/session handling, account recovery, student learning and assessment workflows, instructor content management, administrator tools and full workflow testing.
+Dio handles HTTP and multipart requests; flutter_secure_storage stores session tokens; Provider exposes session and management state. image_picker and file_picker select media, mime/http_parser supply file content types, video_player plays lessons, and url_launcher opens resources. Exact resolved versions are in pubspec.lock.
 
-These are planned capabilities. Update the current implementation status as features are completed, and keep internal progress evidence in the appropriate authorized location.
+- Student: login → Home/Courses → course details → enroll → lessons/progress → quizzes/assignments → reviews; notifications and profile are available from the student shell.
+- Instructor: login → dashboard → course workspace → sections/lessons/media → publish → quizzes/assignments → attempts/submissions/grading → enrollments.
+- Admin: login → overview → users/status → platform categories/courses/enrollments/reviews → profile. Destructive operations require confirmation.
+
+## Handover and known limitations
+
+See [Day 10 acceptance and demonstration checklist](docs/day_10.md). Automated transport tests use test-only adapters; they do not prove live server acceptance. Android is the only included platform. The documented reviews endpoint cannot discover previously hidden reviews; see [Day 9](docs/day_09.md). Final authenticated demonstrations and repository submission must be recorded separately.
+
+The supplied task plan provides these reference links. Access permissions are controlled by their owners:
+
+- [Backend API Report](https://drive.google.com/file/d/1Ld_IvM_4GHhoaakGetEbuWAv5LH_aCf3/view?usp=sharing)
+- [Mobile API Integration Guide](https://drive.google.com/file/d/18kwcNqfnkxLb0TZER_TNbocSUFs4Acl2/view?usp=sharing)
+- [Postman collection JSON](https://drive.google.com/file/d/16DjEWlX0f889g6Njln-8Iy38kxUlBXKc/view?usp=sharing)
 
 ## Development conventions
 
 - Keep features organized under `lib/features/`; introduce shared networking and session code when integration begins.
 - Use exact backend methods, paths, field names and status values from the supplied API resources.
 - Use IDs returned by the backend rather than hardcoded test IDs.
-- Planned API-driven screens should provide loading, empty, success and error states, with role-appropriate access and confirmation for destructive actions.
+- API-driven screens provide loading, empty, success and error states, with role-appropriate access and confirmation for destructive actions.
 - Never commit tokens, passwords, private keys, database credentials or machine-specific SDK configuration.
 - Use small, meaningful Conventional Commits, such as `feat(auth): add shared login UI`.
 
@@ -349,7 +361,7 @@ GitHub repository creation, commits and pushing are handled manually by the deve
 - All protected features require authenticated, role-authorized backend access.
 - Use HTTPS for deployed API connections. Local HTTP addresses in this guide are development examples only.
 
-The installation links in this README point only to public software vendors and public tooling documentation. No internal data-resource links or shared conversation links are included.
+Reference links above were transcribed from the supplied task plan. Keep their access restricted to authorized reviewers.
 
 ## Feature verification
 

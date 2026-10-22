@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/network/api_exception.dart';
+
 import '../../widgets/student_ui.dart';
 
 import 'package:http_parser/http_parser.dart';
@@ -73,8 +75,26 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
   }
 
   Future<void> choose() => run(() async {
-    final selected = await FilePicker.pickFile();
-    if (selected != null) file = selected;
+    final selected = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: [
+        'pdf',
+        'doc',
+        'docx',
+        'zip',
+        'jpg',
+        'jpeg',
+        'png',
+        'txt',
+      ],
+    );
+    if (selected.isEmpty) return;
+    final candidate = selected.single;
+    final size = await candidate.length();
+    if (size == null || size > 20 * 1024 * 1024) {
+      throw const ApiException(message: 'Choose a supported file up to 20 MB.');
+    }
+    file = candidate;
   });
   Future<void> send() async {
     if (graded || !loaded || busy) return;

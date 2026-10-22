@@ -8,6 +8,7 @@ Future<bool> confirmActivity(
     await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
         title: Text(title),
         content: Text(message),
         actions: [
