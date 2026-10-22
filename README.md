@@ -322,6 +322,23 @@ flutter analyze
 flutter test --concurrency=1
 ```
 
+To show each test during evaluation, run `flutter test --concurrency=1 --reporter expanded`.
+To check one area, run `flutter test test/<filename>` using the files below:
+
+| Area | Test file |
+| --- | --- |
+| Onboarding and navigation | `onboarding_navigation_test.dart` |
+| Login and registration | `login_registration_test.dart` |
+| Authentication and sessions | `authentication_session_test.dart` |
+| API tokens, refresh and retry | `core_api_test.dart` |
+| Student learning | `student_learning_test.dart` |
+| Assessments and notifications | `assessments_notifications_test.dart` |
+| Instructor management | `instructor_management_test.dart` |
+| Admin management | `admin_management_test.dart` |
+| Final acceptance regressions | `acceptance_regression_test.dart` |
+
+Additional tests cover role dashboards, admin layouts, learning widgets, video playback and profile saving.
+
 During initial verification, formatting and analysis passed, both UI tests passed, and the Android debug APK built, installed and opened successfully on an emulator. The direct build/install steps succeeded; the helper packages those steps for repeat use. The normal Flutter launcher still encountered system memory pressure in a follow-up check.
 
 ## Packages and role flows

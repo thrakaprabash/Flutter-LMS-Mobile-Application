@@ -11,7 +11,7 @@ import 'package:flutter_lms/features/admin/dashboard/screens/admin_home_screen.d
 import 'package:flutter_lms/features/admin/screens/admin_list_screen.dart';
 import 'package:flutter_lms/shared/providers/auth_provider.dart';
 
-import 'day_09_test.dart' as fixtures;
+import 'admin_management_test.dart' as fixtures;
 
 void main() {
   testWidgets(

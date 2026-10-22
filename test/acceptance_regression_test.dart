@@ -6,7 +6,7 @@ import 'package:flutter_lms/features/student/assignments/screens/assignment_scre
 import 'package:flutter_lms/features/student/notifications/screens/notifications_screen.dart';
 import 'package:flutter_lms/shared/providers/auth_provider.dart';
 
-import 'day_09_test.dart' as fixtures;
+import 'admin_management_test.dart' as fixtures;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_lms/core/theme/app_theme.dart';
