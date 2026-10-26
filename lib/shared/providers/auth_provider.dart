@@ -21,6 +21,7 @@ class AuthProvider extends ChangeNotifier {
     _ => '/',
   };
   bool get authenticated => user != null;
+  bool get canDeactivateAccount => ['STUDENT', 'INSTRUCTOR'].contains(role);
   static String message(Object error) => error is DioException
       ? ApiException.fromDio(error).message
       : error is ApiException
@@ -96,6 +97,16 @@ class AuthProvider extends ChangeNotifier {
       'POST',
       '/api/v1/auth/${all ? 'logout-all' : 'logout'}',
     );
+    await invalidate();
+  }
+
+  Future<void> deactivateAccount() async {
+    if (!canDeactivateAccount) {
+      throw const ApiException(
+        message: 'This account cannot be deactivated from the app.',
+      );
+    }
+    await service.request('PATCH', '/api/v1/users/me/deactivate');
     await invalidate();
   }
 }

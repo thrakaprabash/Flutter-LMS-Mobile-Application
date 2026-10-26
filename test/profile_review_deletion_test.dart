@@ -63,6 +63,27 @@ class DeletionAccount extends AccountService {
 }
 
 void main() {
+  testWidgets('admin profile has no deletion or deactivation controls', (
+    tester,
+  ) async {
+    final account = DeletionAccount('ADMIN');
+    final auth = AuthProvider(account, fixtures.storage)..user = account.user;
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: auth,
+        child: const MaterialApp(home: ProfileScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Log out all devices'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Deactivate account'), findsNothing);
+    expect(find.text('Delete profile details'), findsNothing);
+    expect(account.calls, isEmpty);
+  });
   for (final role in ['STUDENT', 'INSTRUCTOR']) {
     testWidgets(
       '$role profile deletion preserves account and clears role details',
@@ -77,7 +98,7 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        final control = find.text('Delete Profile');
+        final control = find.text('Delete profile details');
         await tester.scrollUntilVisible(
           control,
           300,
@@ -101,7 +122,8 @@ void main() {
         expect(account.calls, ['/api/v1/profiles/${role.toLowerCase()}/me']);
         expect(auth.authenticated, true);
         expect(auth.profile, isNull);
-        expect(find.text('Delete Profile'), findsNothing);
+        expect(find.text('Delete profile details'), findsNothing);
+        expect(find.text('Deactivate account'), findsOneWidget);
       },
     );
   }

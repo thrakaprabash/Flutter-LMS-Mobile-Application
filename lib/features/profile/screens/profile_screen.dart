@@ -319,6 +319,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  Future<void> deactivateAccount() async {
+    if (_busy) return;
+    final auth = context.read<AuthProvider>();
+    if (!auth.canDeactivateAccount) return;
+    if (!await confirmActivity(
+      context,
+      'Deactivate account?',
+      'You will be signed out on all devices and unable to log in. Your records will remain stored. Only an administrator can reactivate your account.',
+    )) {
+      return;
+    }
+    if (!mounted) return;
+    await run(() async {
+      await auth.deactivateAccount();
+      if (!mounted) return;
+      if (widget.onSignedOut != null) {
+        widget.onSignedOut!();
+      } else {
+        Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
+      }
+    });
+  }
+
   Widget _initials(AuthProvider auth) {
     final first = (auth.user?['firstName']?.toString() ?? '').trim();
     final last = (auth.user?['lastName']?.toString() ?? '').trim();
@@ -674,11 +697,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: Icon(Icons.delete_outline, color: colors.error),
-                  title: const Text('Delete Profile'),
+                  title: const Text('Delete profile details'),
                   subtitle: const Text(
                     'Remove profile details; keep your account',
                   ),
                   onTap: _busy ? null : deleteProfile,
+                ),
+              if (['STUDENT', 'INSTRUCTOR'].contains(auth.role) &&
+                  auth.profile == null)
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    'No profile details saved. Your account is active. Fill in your details and save changes to recreate your profile.',
+                  ),
+                ),
+              if (auth.canDeactivateAccount)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.person_off_outlined, color: colors.error),
+                  title: const Text('Deactivate account'),
+                  subtitle: const Text(
+                    'Disable login and sign out on all devices',
+                  ),
+                  onTap: _busy ? null : deactivateAccount,
                 ),
               ListTile(
                 contentPadding: EdgeInsets.zero,

@@ -36,6 +36,57 @@ void main() {
     expect(auth.authenticated, isFalse);
     expect(await storage.readAccessToken(), isNull);
   });
+  for (final succeeds in [true, false]) {
+    test(
+      'account deactivation clears session only on success=$succeeds',
+      () async {
+        final dio = Dio(ApiClient.options())
+          ..httpClientAdapter = FakeAdapter((request) {
+            expect(request.method, 'PATCH');
+            expect(request.path, '/api/v1/users/me/deactivate');
+            expect(request.headers['Authorization'], 'Bearer access');
+            expect(request.data, isNull);
+            return body(succeeds ? 200 : 500, {'message': 'Result'});
+          });
+        final auth = AuthProvider(
+          AccountService(ApiClient(storage, client: dio)),
+          storage,
+        );
+        await auth.accept(session('STUDENT'));
+        auth.profile = {'educationLevel': 'Undergraduate'};
+        if (succeeds) {
+          await auth.deactivateAccount();
+          expect(auth.profile, isNull);
+          expect(await storage.readAccessToken(), isNull);
+          expect(await storage.readRefreshToken(), isNull);
+          expect(await storage.readRole(), isNull);
+        } else {
+          await expectLater(auth.deactivateAccount(), throwsException);
+          expect(auth.profile, isNotNull);
+          expect(await storage.readRefreshToken(), 'refresh');
+        }
+        expect(auth.authenticated, !succeeds);
+      },
+    );
+  }
+  test(
+    'admin cannot deactivate account or send a deactivation request',
+    () async {
+      final dio = Dio(ApiClient.options())
+        ..httpClientAdapter = FakeAdapter((request) {
+          fail('Admin deactivation must not reach the backend.');
+        });
+      final auth = AuthProvider(
+        AccountService(ApiClient(storage, client: dio)),
+        storage,
+      );
+      await auth.accept(session('ADMIN'));
+      expect(auth.canDeactivateAccount, isFalse);
+      await expectLater(auth.deactivateAccount(), throwsException);
+      expect(auth.authenticated, isTrue);
+      expect(await storage.readRefreshToken(), 'refresh');
+    },
+  );
   test('restore gets current backend role and profile', () async {
     await storage.saveSession(
       accessToken: 'access',
